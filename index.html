@@ -1,0 +1,260 @@
+<html>
+<head>
+    <title>Cost cutters</title>
+    <meta name="author" content="Caspian North & Amalaric Le Forestier" />
+    <meta name="description" content="Find the cheapest prices around you">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <script src="https://kit.fontawesome.com/79f61c2135.js" crossorigin="anonymous"></script>
+    <link rel="icon" href="images/logo.ico" />
+    <link rel="stylesheet" href="styles/style.css" type="text/css" />
+    <link rel="stylesheet" href="styles/mediaqueries.css" type="text/css" />
+    <script src="scripts/script.js" ></script>
+</head>
+
+<body>
+<div id="progress"></div>       <!-- Progress bar -->
+<header>
+    <div class="header-container">
+        <a href="#" class="logo">
+            <img src="images/logo.ico" alt="Cost Cutters Logo">
+        </a>
+        <nav>
+            <div class="menu-icon" id="menu-icon">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Find ingredients</a></li>
+                <li><a href="#">Recipes</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- MAIN SCREEN -->
+<main class="homepage">
+    <section class="container">
+        <div class="my-recipes">
+            <h2>MY RECIPES</h2>
+            <ul>
+                <li>'Pierogi' - 25PLN</li>
+                <li>'Beans on toast' - 10PLN</li>
+                <li>'Zabka hotdog' - 6PLN</li>
+                <li>'Strawberry jam' - 10PLN</li>
+            </ul>
+            <div class="recipes-btn">
+                <button>CREATE A RECIPE</button>
+                <button>SAVED RECIPES</button>
+                <button>IMPORT RECIPE</button>
+            </div>
+
+        </div>
+        <div class="blog">
+            <div class="blog-post">
+                <img src="images/sample_image.png" alt="TBD">
+                <h3>RECIPE 1</h3>
+                <ul>
+                    <li>xxxkCAL</li>
+                    <li>Quick (5-10 minutes)</li>
+                    <li>Cheap (20PLN/PP)</li>
+                </ul>
+                <a href="#">CLICK TO GO TO RECIPE</a>
+            </div>
+            <h2>BLOG</h2>
+            <div class="blog-post">
+                <img src="images/sample_image.png" alt="TBD">
+                <h3>RECIPE 2</h3>
+                <ul>
+                    <li>xxxkCAL</li>
+                    <li>Quick (5-10 minutes)</li>
+                    <li>Cheap (20PLN/PP)</li>
+                </ul>
+                <a href="#">CLICK TO GO TO RECIPE</a>
+            </div>
+        </div>
+    </section>
+    <section class="find-cheapest">
+        <h1>Find the cheapest ingredients</h1>
+        <div class="input-table-container">
+            <table class="input-table">
+                <thead>
+                <tr>
+                    <th>Ingredient</th>
+                    <th>Quantity</th>
+                </tr>
+                </thead>
+                <tbody id="ingredient-rows">
+                <tr>
+                    <td><input type="text" placeholder="Ingredient"></td>
+                    <td><input type="number" placeholder="Quantity"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Ingredient"></td>
+                    <td><input type="number" placeholder="Quantity"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="btn-container">
+                <button id="add-row-button">+</button>
+                <button id="find-button">Find</button>
+            </div>
+        </div>
+        <div id="results-container" class="hidden">
+            <table class="results-table">
+                <thead>
+                <tr>
+                    <th>Ingredient</th>
+                    <th>Quantity</th>
+                    <th>Cost/Item</th>
+                    <th>Total Cost</th>
+                    <th>Store</th>
+                    <th>Travel Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Tomatoes</td>
+                    <td>2 kg</td>
+                    <td>3 PLN</td>
+                    <td>6 PLN</td>
+                    <td>Zabka</td>
+                    <td>10 min</td>
+                </tr>
+                <tr>
+                    <td>Cheese</td>
+                    <td>1 kg</td>
+                    <td>20 PLN</td>
+                    <td>20 PLN</td>
+                    <td>Biedronka</td>
+                    <td>15 min</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section class="recipe-container">
+        <h1>Recipes</h1>
+        <div class="recipe-cards">
+            <div class="recipe-card">
+                <img src="images/sample_image.png" alt="TBD">
+                <div class="recipe-details">
+                    <h3>TODAY'S SPECIAL</h3>
+                    <h4>PIEROGI</h4>
+                    <ul>
+                        <li>Cheap</li>
+                        <li>Quick (3 minutes)</li>
+                        <li>Cheap (5PLN/PP)</li>
+                    </ul>
+                    <a href="#" class="recipe-link" data-recipe="foobar">CLICK TO GO TO RECIPE</a>
+                </div>
+            </div>
+            <div class="recipe-card">
+                <img src="images/sample_image.png" alt="TBD">
+                <div class="recipe-details">
+                    <h3>VEGETARIAN OPTION</h3>
+                    <h4>PIEROGI</h4>
+                    <ul>
+                        <li>Cheap</li>
+                        <li>Quick (3 minutes)</li>
+                        <li>Cheap (5PLN/PP)</li>
+                    </ul>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                </div>
+            </div>
+            <div class="recipe-card">
+                <img src="images/sample_image.png" alt="TBD">
+                <div class="recipe-details">
+                    <h3>DATE NIGHT OPTION</h3>
+                    <h4>PIEROGI</h4>
+                    <ul>
+                        <li>Cheap</li>
+                        <li>Quick (3 minutes)</li>
+                        <li>Cheap (5PLN/PP)</li>
+                    </ul>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                </div>
+            </div>
+            <div class="recipe-card">
+                <img src="images/sample_image.png" alt="TBD">
+                <div class="recipe-details">
+                    <h3>Polish Option</h3>
+                    <h4>PIEROGI</h4>
+                    <ul>
+                        <li>Cheap</li>
+                        <li>Quick (3 minutes)</li>
+                        <li>Cheap (5PLN/PP)</li>
+                    </ul>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="recipe-details" class="recipe-details-block">
+            <div class="recipe-table-container">
+                <h2>Recipe - {UserRecipe} BY {UserName}</h2>
+                <table class="ingredients-table">
+                    <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Cost/Item</th>
+                        <th>Total Cost</th>
+                        <th>Store</th>
+                        <th>Travel Time</th>
+                    </tr>
+                    </thead>
+                    <tbody id="ingredients-list">
+                        <!-- Dynamically filled with ingredients -->
+                    <tr>
+                        <td>Flour</td>
+                        <td>500g</td>
+                        <td>2 PLN</td>
+                        <td>4 PLN</td>
+                        <td>Zabka</td>
+                        <td>10 min</td>
+                    </tr>
+                    <tr>
+                        <td>Water</td>
+                        <td>1L</td>
+                        <td>1 PLN</td>
+                        <td>1 PLN</td>
+                        <td>Biedronka</td>
+                        <td>5 min</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="total-cost-container">
+                <div class="total-cost-block">
+                    <h2>Total Meal Cost</h2>
+                    <p class="total-cost">500 PLN</p>
+                    <div class="actions">
+                        <button id="save-recipe">Save</button>
+                        <button id="export-recipe">Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-credits">
+            <p>&copy; Cost Quest. All rights reserved.</p>
+        </div>
+        <div class="footer-links">
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">About Us</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+</body>
+
+</html>
