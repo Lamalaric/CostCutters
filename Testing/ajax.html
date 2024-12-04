@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Button Text</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Run Python Functions and Update Buttons</h1>
+
+    <button id="greetBtn">Greet</button>
+    <button id="addBtn">Add Numbers</button>
+    <button id="multiplyBtn">Multiply Numbers</button>
+    <button id="dynamicBtn">I will change!</button> <!-- Button to be dynamically updated -->
+
+    <h2>Output:</h2>
+    <div id="output"></div>
+
+    <script>
+        $(document).ready(function () {
+            // Function to call Python and dynamically change button text
+            function callPythonFunction(functionName, data, buttonToUpdate) {
+                data.function = functionName; // Add the function name to the data
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/run-function', // Adjust if using separate routes
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        // Update the button text with server response
+                        if (response.message) {
+                            $(buttonToUpdate).text(response.message); // For 'greet'
+                        } else if (response.result !== undefined) {
+                            $(buttonToUpdate).text(`Result: ${response.result}`); // For math functions
+                        }
+                        // Display response in the output div
+                        $('#output').append(`<p><strong>${functionName}:</strong> ${JSON.stringify(response)}</p>`);
+                    },
+                    error: function (err) {
+                        // Display error message
+                        $('#output').append(`<p style="color: red;"><strong>Error:</strong> Could not call ${functionName}. Check console for details.</p>`);
+                        console.error(err);
+                    }
+                });
+            }
+
+            // Event listeners for buttons
+            $('#greetBtn').click(function () {
+                callPythonFunction('greet', { name: "Alice" }, '#dynamicBtn'); // Update the "dynamicBtn" text
+            });
+
+            $('#addBtn').click(function () {
+                callPythonFunction('add', { num1: 5, num2: 3 }, '#dynamicBtn'); // Update the "dynamicBtn" text
+            });
+
+            $('#multiplyBtn').click(function () {
+                callPythonFunction('multiply', { num1: 4, num2: 6 }, '#dynamicBtn'); // Update the "dynamicBtn" text
+            });
+        });
+    </script>
+</body>
+</html>

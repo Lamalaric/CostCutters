@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Item from Store</title>
+    <style>
+        .form-row {
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        let itemCount = 1;
+
+        // Function to add more input fields dynamically
+        function addItemRow() {
+            itemCount++;
+            const container = document.getElementById('itemRows');
+            const row = document.createElement('div');
+            row.classList.add('form-row');
+            row.innerHTML = `
+                <input type="text" id="store${itemCount}" class="store" placeholder="Enter store name" required>
+                <input type="text" id="item${itemCount}" class="item" placeholder="Enter item name" required>
+            `;
+            container.appendChild(row);
+        }
+
+        // Function to submit the form and fetch the data
+        async function submitForm() {
+            const storesAndItems = [];
+            const storeInputs = document.querySelectorAll('.store');
+            const itemInputs = document.querySelectorAll('.item');
+
+            // Collect the store-item pairs
+            for (let i = 0; i < storeInputs.length; i++) {
+                const store = storeInputs[i].value.trim();
+                const item = itemInputs[i].value.trim();
+
+                // Validate that neither store nor item is empty
+                if (store && item) {
+                    storesAndItems.push({ store, item });
+                } else {
+                    alert("Both store and item must be filled in for all rows.");
+                    return;  // Prevent submission if any row is incomplete
+                }
+            }
+
+            // Send data to the server
+            try {
+                const response = await fetch('http://127.0.0.1:5000/get-item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ items: storesAndItems })
+                });
+
+                const data = await response.json();
+                if (data.data) {
+                    displayItems(data.data);
+                } else {
+                    alert("Error: " + data.message);
+                }
+            } catch (error) {
+                console.log("Request failed:", error);
+                alert("Error: " + error.message);
+            }
+        }
+
+        // Function to display the items in the table
+        function displayItems(items) {
+            const tableBody = document.getElementById('resultTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear the table
+
+            const seenItems = new Set();  // To track unique items
+
+            items.forEach(item => {
+                const uniqueKey = item.store + item.item;
+                if (!seenItems.has(uniqueKey)) {
+                    seenItems.add(uniqueKey);  // Mark as seen
+
+                    const row = tableBody.insertRow();
+                    row.insertCell(0).textContent = item.store;
+                    row.insertCell(1).textContent = item.item;
+                    row.insertCell(2).textContent = item.price;
+                    row.insertCell(3).textContent = item.lat;
+                    row.insertCell(4).textContent = item.lon;
+                }
+            });
+
+            document.getElementById('resultTable').style.display = 'block'; // Show the table
+        }
+    </script>
+</head>
+<body>
+    <h1>Retrieve Item from Store</h1>
+
+    <form onsubmit="event.preventDefault(); submitForm();">
+        <div id="itemRows">
+            <div class="form-row">
+                <input type="text" class="store" placeholder="Enter store name" required>
+                <input type="text" class="item" placeholder="Enter item name" required>
+            </div>
+        </div>
+        <button type="button" onclick="addItemRow()">Add More</button>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Results</h2>
+    <table id="resultTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Store</th>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Results will go here -->
+        </tbody>
+    </table>
+</body>
+</html>
