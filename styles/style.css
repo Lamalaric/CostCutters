@@ -254,6 +254,25 @@ button#add-row-button:hover, button#find-button:hover {
     background-color: var(--clr-accent-2);
 }
 
+
+button#add-row-button, button#save-button {
+    transition-duration: .3s;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: var(--clr-accent-1);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+button#add-row-button, button#save-button {
+    width: 150px;
+    height: 50px;
+}
+button#add-row-button:hover, button#save-button:hover {
+    transition-duration: .3s;
+    background-color: var(--clr-accent-2);
+}
+
 .results-table {
     width: 100%;
     margin-top: 80px;
