@@ -1,5 +1,60 @@
 <html>
 <head>
+        <!-- added by caspian style -->
+    <style>
+        /* Styles for hiding rows initially */
+        .hidden {
+            display: none;
+        }
+
+        /* Table and button styles */
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        #add-row-btn {
+            padding: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .input-table-container {
+            margin-bottom: 20px;
+        }
+
+        /* Results table styles */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        #results-container {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+
     <title>Cost cutters</title>
     <meta name="author" content="Caspian North & Amalaric Le Forestier" />
     <meta name="description" content="Find the cheapest prices around you">
@@ -10,7 +65,11 @@
     <link rel="stylesheet" href="styles/style.css" type="text/css" />
     <link rel="stylesheet" href="styles/mediaqueries.css" type="text/css" />
     <script src="scripts/script.js" ></script>
+
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
 </head>
+
 
 <body>
 <div id="progress"></div>       <!-- Progress bar -->
@@ -75,25 +134,30 @@
             </div>
         </div>
     </section>
+
+    <!-- SECOND SCREEN -->
     <section class="find-cheapest">
-        <h1>Find the cheapest ingredients</h1>
+        <h1>Find the cheapest ingredients - make your recipe</h1>
         <div class="input-table-container">
             <table class="input-table">
                 <thead>
-                <tr>
-                    <th>Ingredient</th>
-                    <th>Quantity</th>
-                </tr>
+                    <tr>
+                        <th>Store</th>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                    </tr>
                 </thead>
                 <tbody id="ingredient-rows">
-                <tr>
-                    <td><input type="text" placeholder="Ingredient"></td>
-                    <td><input type="number" placeholder="Quantity"></td>
-                </tr>
-                <tr>
-                    <td><input type="text" placeholder="Ingredient"></td>
-                    <td><input type="number" placeholder="Quantity"></td>
-                </tr>
+                    <tr>
+                        <td><input type="text" placeholder="Store"></td>
+                        <td><input type="text" placeholder="Ingredient"></td>
+                        <td><input type="number" placeholder="Quantity"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" placeholder="Store"></td>
+                        <td><input type="text" placeholder="Ingredient"></td>
+                        <td><input type="number" placeholder="Quantity"></td>
+                    </tr>
                 </tbody>
             </table>
             <div class="btn-container">
@@ -101,39 +165,98 @@
                 <button id="find-button">Find</button>
             </div>
         </div>
-        <div id="results-container" class="hidden">
+    
+        <!-- Results Table -->
+        <div id="results-container">
             <table class="results-table">
                 <thead>
-                <tr>
-                    <th>Ingredient</th>
-                    <th>Quantity</th>
-                    <th>Cost/Item</th>
-                    <th>Total Cost</th>
-                    <th>Store</th>
-                    <th>Travel Time</th>
-                </tr>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Cost/Item</th>
+                        <th>Total Cost</th>
+                        <th>Store</th>
+                        <th>Travel Time</th>
+                    </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td>Tomatoes</td>
-                    <td>2 kg</td>
-                    <td>3 PLN</td>
-                    <td>6 PLN</td>
-                    <td>Zabka</td>
-                    <td>10 min</td>
-                </tr>
-                <tr>
-                    <td>Cheese</td>
-                    <td>1 kg</td>
-                    <td>20 PLN</td>
-                    <td>20 PLN</td>
-                    <td>Biedronka</td>
-                    <td>15 min</td>
-                </tr>
+                <tbody id="results-body">
+                    <!-- Dynamic rows will be added here -->
                 </tbody>
             </table>
         </div>
     </section>
+    
+    <script>
+        // Add event listener to the "add-row-button" button
+        document.getElementById("add-row-button").addEventListener("click", function() {
+            const ingredientRows = document.getElementById("ingredient-rows");
+            
+            // Create a new row with the same structure as the previous rows
+            const newRow = document.createElement("tr");
+    
+            const storeCell = document.createElement("td");
+            storeCell.innerHTML = '<input type="text" placeholder="Store">';
+            
+            const ingredientCell = document.createElement("td");
+            ingredientCell.innerHTML = '<input type="text" placeholder="Ingredient">';
+            
+            const quantityCell = document.createElement("td");
+            quantityCell.innerHTML = '<input type="number" placeholder="Quantity">';
+            
+            newRow.appendChild(storeCell);
+            newRow.appendChild(ingredientCell);
+            newRow.appendChild(quantityCell);
+            
+            // Append the new row to the table body
+            ingredientRows.appendChild(newRow);
+        });
+    
+        // Add event listener for the "find-button" to handle the search functionality
+        document.getElementById("find-button").addEventListener("click", function() {
+            const rows = document.querySelectorAll("#ingredient-rows tr");
+            let ingredients = [];
+    
+            // Collect ingredient, store, and quantity values from each row
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll("input");
+                const store = inputs[0].value.trim();
+                const ingredient = inputs[1].value.trim();
+                const quantity = inputs[2].value.trim();
+    
+                if (store && ingredient && quantity) {
+                    ingredients.push({ store, ingredient, quantity });
+                }
+            });
+    
+            // Display results (for now, this just logs the collected ingredients)
+            console.log("Ingredients collected:", ingredients);
+    
+            // You can replace this with actual functionality to search for prices, etc.
+            document.getElementById("results-container").style.display = "block";
+            
+            // Example: Populate the results table
+            const resultsBody = document.getElementById("results-body");
+            resultsBody.innerHTML = ""; // Clear previous results
+    
+            ingredients.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.ingredient}</td>
+                    <td>${item.quantity}</td>
+                    <td>2.50</td> <!-- Example price -->
+                    <td>${(2.50 * item.quantity).toFixed(2)}</td> <!-- Total Cost -->
+                    <td>${item.store}</td>
+                    <td>10 minutes</td> <!-- Example travel time -->
+                `;
+                resultsBody.appendChild(row);
+            });
+        });
+    </script>
+    
+    
+    
+    
+    <!-- THIRD SCREEN -->
     <section class="recipe-container">
         <h1>Recipes</h1>
         <div class="recipe-cards">
@@ -190,7 +313,7 @@
                 </div>
             </div>
         </div>
-
+        <!-- RECIPIE SCREEN -->
         <div id="recipe-details" class="recipe-details-block">
             <div class="recipe-table-container">
                 <h2>Recipe - {UserRecipe} BY {UserName}</h2>

@@ -1,0 +1,436 @@
+<html>
+<head>
+        <!-- added by caspian style -->
+    <style>
+        /* Styles for hiding rows initially */
+        .hidden {
+            display: none;
+        }
+
+        /* Table and button styles */
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        #add-row-btn {
+            padding: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .input-table-container {
+            margin-bottom: 20px;
+        }
+
+        /* Results table styles */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        #results-container {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+
+    <title>Cost cutters</title>
+    <meta name="author" content="Caspian North & Amalaric Le Forestier" />
+    <meta name="description" content="Find the cheapest prices around you">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <script src="https://kit.fontawesome.com/79f61c2135.js" crossorigin="anonymous"></script>
+    <link rel="icon" href="images/logo.ico" />
+    <link rel="stylesheet" href="styles/style.css" type="text/css" />
+    <link rel="stylesheet" href="styles/mediaqueries.css" type="text/css" />
+    <script src="scripts/script.js" ></script>
+
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+</head>
+
+
+<body>
+<div id="progress"></div>       <!-- Progress bar -->
+<header>
+    <div class="header-container">
+        <a href="#" class="logo">
+            <img src="images/logo.ico" alt="Cost Cutters Logo">
+        </a>
+        <nav>
+            <div class="menu-icon" id="menu-icon">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Find ingredients</a></li>
+                <li><a href="#">Recipes</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- MAIN SCREEN -->
+<main class="homepage">
+    <section class="container">
+        <div class="my-recipes">
+            <h2>MY RECIPES</h2>
+            <ul>
+                <li>'Pierogi' - 25PLN</li>
+                <li>'Beans on toast' - 10PLN</li>
+                <li>'Zabka hotdog' - 6PLN</li>
+                <li>'Strawberry jam' - 10PLN</li>
+            </ul>
+            <div class="recipes-btn">
+                <button>CREATE A RECIPE</button>
+                <button>SAVED RECIPES</button>
+                <button>IMPORT RECIPE</button>
+            </div>
+
+        </div>
+        <div class="blog">
+            <div class="blog-post">
+                <img src="images/sample_image.png" alt="TBD">
+                <h3>RECIPE 1</h3>
+                <ul>
+                    <li>xxxkCAL</li>
+                    <li>Quick (5-10 minutes)</li>
+                    <li>Cheap (20PLN/PP)</li>
+                </ul>
+                <a href="#">CLICK TO GO TO RECIPE</a>
+            </div>
+            <h2>BLOG</h2>
+            <div class="blog-post">
+                <img src="images/sample_image.png" alt="TBD">
+                <h3>RECIPE 2</h3>
+                <ul>
+                    <li>xxxkCAL</li>
+                    <li>Quick (5-10 minutes)</li>
+                    <li>Cheap (20PLN/PP)</li>
+                </ul>
+                <a href="#">CLICK TO GO TO RECIPE</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECOND SCREEN -->
+    <section class="find-cheapest">
+        <h1>Find the cheapest ingredients</h1>
+        <div class="input-table-container">
+            <table class="input-table">
+                <thead>
+                    <tr>
+                        <th>Store</th>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody id="ingredient-rows">
+                    <tr>
+                        <td><input type="text" placeholder="Store"></td>
+                        <td><input type="text" placeholder="Ingredient"></td>
+                        <td><input type="number" placeholder="Quantity"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" placeholder="Store"></td>
+                        <td><input type="text" placeholder="Ingredient"></td>
+                        <td><input type="number" placeholder="Quantity"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="btn-container">
+                <button id="add-row-button">+</button>
+                <button id="find-button">Find</button>
+                <button id="save-button">Save to File</button>
+            </div>
+        </div>
+    
+        <!-- Results Table -->
+        <div id="results-container">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Cost/Item</th>
+                        <th>Total Cost</th>
+                        <th>Store</th>
+                        <th>Travel Time</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                    <!-- Dynamic rows will be added here -->
+                </tbody>
+            </table>
+        </div>
+    </section> 
+    <!-- ingredient handler with ajax hook to flask -->
+    <script>
+        // Add event listener to the "add-row-button" button
+        document.getElementById("add-row-button").addEventListener("click", function() {
+            const ingredientRows = document.getElementById("ingredient-rows");
+            
+            // Create a new row with the same structure as the previous rows
+            const newRow = document.createElement("tr");
+    
+            const storeCell = document.createElement("td");
+            storeCell.innerHTML = '<input type="text" placeholder="Store">';
+            
+            const ingredientCell = document.createElement("td");
+            ingredientCell.innerHTML = '<input type="text" placeholder="Ingredient">';
+            
+            const quantityCell = document.createElement("td");
+            quantityCell.innerHTML = '<input type="number" placeholder="Quantity">';
+            
+            newRow.appendChild(storeCell);
+            newRow.appendChild(ingredientCell);
+            newRow.appendChild(quantityCell);
+            
+            // Append the new row to the table body
+            ingredientRows.appendChild(newRow);
+        });
+    
+        // Add event listener for the "find-button" to handle the search functionality
+        document.getElementById("find-button").addEventListener("click", function() {
+            const rows = document.querySelectorAll("#ingredient-rows tr");
+            let ingredients = [];
+    
+            // Collect ingredient, store, and quantity values from each row
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll("input");
+                const store = inputs[0].value.trim();
+                const ingredient = inputs[1].value.trim();
+                const quantity = inputs[2].value.trim();
+    
+                if (store && ingredient && quantity) {
+                    ingredients.push({ store, ingredient, quantity });
+                }
+            });
+    
+            // Display results (for now, this just logs the collected ingredients)
+            console.log("Ingredients collected:", ingredients);
+    
+            // You can replace this with actual functionality to search for prices, etc.
+            document.getElementById("results-container").style.display = "block";
+            
+            // Example: Populate the results table
+            const resultsBody = document.getElementById("results-body");
+            resultsBody.innerHTML = ""; // Clear previous results
+    
+            ingredients.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.ingredient}</td>
+                    <td>${item.quantity}</td>
+                    <td>2.50</td> <!-- Example price -->
+                    <td>${(2.50 * item.quantity).toFixed(2)}</td> <!-- Total Cost -->
+                    <td>${item.store}</td>
+                    <td>10 minutes</td> <!-- Example travel time -->
+                `;
+                resultsBody.appendChild(row);
+            });
+        });
+    </script>
+    <!-- save button listener-->
+    <script>
+        document.getElementById('save-recipe-button').addEventListener('click', function() {
+            // Gather data from the form
+            const username = document.getElementById('username').value;
+            const recipeName = document.getElementById('recipe-name').value;
+            const item1 = document.getElementById('item-1').value;
+            const quantity1 = document.getElementById('quantity-1').value;
+            const item2 = document.getElementById('item-2').value;
+            const quantity2 = document.getElementById('quantity-2').value;
+            const totalPrice = document.getElementById('total-price').value;
+    
+            // Check if necessary fields are filled out
+            if (!username || !recipeName || !item1 || !quantity1 || !totalPrice) {
+                alert("Please fill out all required fields!");
+                return;
+            }
+    
+            // Prepare the list of ingredients for the recipe
+            const items = [
+                { store: "StoreName", item: item1, quantity: quantity1 },
+                { store: "StoreName", item: item2, quantity: quantity2 }
+            ];
+    
+            // Create an object for the recipe data
+            const recipeData = {
+                username: username,
+                recipe_name: recipeName,
+                items: items,
+                total_price: totalPrice
+            };
+    
+            // Send the recipe data to the backend (Flask API)
+            fetch('http://127.0.0.1:5000/add-recipe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(recipeData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => {
+                alert("Error: " + error.message);
+            });
+        });
+    </script>
+    
+    
+    
+    <!-- THIRD SCREEN -->
+    <section class="recipe-container">
+        <h1>Recipes</h1>
+        <div class="recipe-cards">
+            <div class="recipe-card">
+                <img src="images/sample_image.png" alt="TBD">
+                <div class="recipe-details">
+                    <h3>TODAY'S SPECIAL</h3>
+                    <h4>PIEROGI</h4>
+                    <ul>
+                        <li>Cheap</li>
+                        <li>Quick (3 minutes)</li>
+                        <li>Cheap (5PLN/PP)</li>
+                    </ul>
+                    <a href="#" class="recipe-link" data-recipe="foobar">CLICK TO GO TO RECIPE</a>
+                </div>
+            </div>
+            <div class="recipe-card">
+                <img src="images/sample_image.png" alt="TBD">
+                <div class="recipe-details">
+                    <h3>VEGETARIAN OPTION</h3>
+                    <h4>PIEROGI</h4>
+                    <ul>
+                        <li>Cheap</li>
+                        <li>Quick (3 minutes)</li>
+                        <li>Cheap (5PLN/PP)</li>
+                    </ul>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                </div>
+            </div>
+            <div class="recipe-card">
+                <img src="images/sample_image.png" alt="TBD">
+                <div class="recipe-details">
+                    <h3>DATE NIGHT OPTION</h3>
+                    <h4>PIEROGI</h4>
+                    <ul>
+                        <li>Cheap</li>
+                        <li>Quick (3 minutes)</li>
+                        <li>Cheap (5PLN/PP)</li>
+                    </ul>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                </div>
+            </div>
+            <div class="recipe-card">
+                <img src="images/sample_image.png" alt="TBD">
+                <div class="recipe-details">
+                    <h3>Polish Option</h3>
+                    <h4>PIEROGI</h4>
+                    <ul>
+                        <li>Cheap</li>
+                        <li>Quick (3 minutes)</li>
+                        <li>Cheap (5PLN/PP)</li>
+                    </ul>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                </div>
+            </div>
+        </div>
+        <!-- RECIPIE SCREEN -->
+        <div id="recipe-details" class="recipe-details-block">
+            <div class="recipe-table-container">
+                <h2>Recipe - {UserRecipe} BY {UserName}</h2>
+                <table class="ingredients-table">
+                    <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Cost/Item</th>
+                        <th>Total Cost</th>
+                        <th>Store</th>
+                        <th>Travel Time</th>
+                    </tr>
+                    </thead>
+                    <tbody id="ingredients-list">
+                        <!-- Dynamically filled with ingredients -->
+                    <tr>
+                        <td>Flour</td>
+                        <td>500g</td>
+                        <td>2 PLN</td>
+                        <td>4 PLN</td>
+                        <td>Zabka</td>
+                        <td>10 min</td>
+                    </tr>
+                    <tr>
+                        <td>Water</td>
+                        <td>1L</td>
+                        <td>1 PLN</td>
+                        <td>1 PLN</td>
+                        <td>Biedronka</td>
+                        <td>5 min</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="total-cost-container">
+                <div class="total-cost-block">
+                    <h2>Total Meal Cost</h2>
+                    <p class="total-cost">500 PLN</p>
+                    <div class="actions">
+                        <button id="save-recipe">Save</button>
+                        <button id="export-recipe">Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-credits">
+            <p>&copy; Cost Quest. All rights reserved.</p>
+        </div>
+        <div class="footer-links">
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">About Us</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+</body>
+
+</html>
