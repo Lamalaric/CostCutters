@@ -1,185 +1,233 @@
-#!/usr/bin/env python3
-# -- CostCutters Database software --
-import time, os, sys, sqlite3, math
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import sqlite3
+#region Initialize Flask application
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+# Database class
+#endregion
 
 
-
-class database():
-    """This class is designed to create and modify the database for our website"""
+class Database:
     def __init__(self):
-        """Initilisation function and initial connect to our db"""
-        
-        con = sqlite3.connect("PriceList.db")
-            # Database connected or created if non existent 
+        """Initialization function and initial connection to the database."""
+        self.db_name = "PriceList.db"
+
+    def execute_query(self, query, params=None, fetch=False):
+        """Utility to execute a query with or without parameters."""
+        con = sqlite3.connect(self.db_name)
+        con.row_factory = sqlite3.Row  # This will allow access to rows as dictionaries
         cur = con.cursor()
-            # test cursor (delete later)
-        print("Database initialised")
-        
-    def _append(self, key, item, price, store):
-        """Adds an item from a shop to the database"""
-        pass
-    
-    def _generateKey(self, item, store):
-        """Item + store = key to detect same items"""
-        pass
-    
-    def conflictDetect(self, key):
-        """Return True if item already exists in DB"""
-        pass
+        result = None
+        try:
+            if params:
+                cur.execute(query, params)
+            else:
+                cur.execute(query)
+            if fetch:
+                result = cur.fetchall()
+            con.commit()
+        except Exception as e:
+            con.rollback()
+            raise e
+        finally:
+            cur.close()
+            con.close()
+        return result
 
-
-    def getItem(self, store, item):
-
-        con = sqlite3.connect("PriceList.db")
-        cur = con.cursor()
-
-        
-        query ="""
-            SELECT store, item, price, lat, lon
-            FROM prices
-            WHERE store = ? AND item = ?
-            """
-
-
-        # Execute the query with parameters
-        cur.execute(query, (store, item))
-
-        # Fetch the result
-        result = cur.fetchall()
-
-        # Check if we got any result and print it
-        if result:
-            for row in result:
-                print(f"Store: {row[0]}, Item: {row[1]}, Price: {row[2]}PLN, Latitude: {row[3]}, Longitude: {row[4]}")
-        else:
-            print(f"No data found for {item} in {store}.")
-
-        # Close the connection
-        con.close()
-
-
-    def AddItem(self, store, price, lat, lon):
-        insert_query = """
-        INSERT INTO prices (store, item, price, lat, lon) VALUES
-        ('Lidl', 'Cheese', 4.60, 51.1150, 17.0300);""")
-        
-    def CreateBlank(self):
-        # quickly connect and execute table creation
-        con = sqlite3.connect("PriceList.db")
-        cur = con.cursor()
-        
-        insert_query = """
-        INSERT INTO prices (store, item, price, lat, lon) VALUES
-        ('Zabka', 'Flour', 2.50, 51.1079, 17.0385),
-        ('Zabka', 'Sugar', 1.80, 51.1079, 17.0385),
-        ('Zabka', 'Eggs', 3.20, 51.1079, 17.0385),
-        ('Zabka', 'Milk', 1.50, 51.1079, 17.0385),
-        ('Zabka', 'Butter', 4.00, 51.1079, 17.0385),
-        ('Zabka', 'Olive Oil', 5.50, 51.1079, 17.0385),
-        ('Zabka', 'Salt', 1.00, 51.1079, 17.0385),
-        ('Zabka', 'Pepper', 2.10, 51.1079, 17.0385),
-        ('Zabka', 'Rice', 3.50, 51.1079, 17.0385),
-        ('Zabka', 'Pasta', 2.30, 51.1079, 17.0385),
-        ('Zabka', 'Tomatoes', 4.00, 51.1079, 17.0385),
-        ('Zabka', 'Garlic', 1.90, 51.1079, 17.0385),
-        ('Zabka', 'Onions', 2.20, 51.1079, 17.0385),
-        ('Zabka', 'Carrots', 1.60, 51.1079, 17.0385),
-        ('Zabka', 'Potatoes', 1.30, 51.1079, 17.0385),
-        ('Zabka', 'Chicken Breast', 8.00, 51.1079, 17.0385),
-        ('Zabka', 'Beef', 10.50, 51.1079, 17.0385),
-        ('Zabka', 'Pork', 7.00, 51.1079, 17.0385),
-        ('Zabka', 'Fish', 5.80, 51.1079, 17.0385),
-        ('Zabka', 'Cheese', 4.50, 51.1079, 17.0385),
-        ('Biedronka', 'Flour', 2.40, 51.1090, 17.0450),
-        ('Biedronka', 'Sugar', 1.70, 51.1090, 17.0450),
-        ('Biedronka', 'Eggs', 3.00, 51.1090, 17.0450),
-        ('Biedronka', 'Milk', 1.40, 51.1090, 17.0450),
-        ('Biedronka', 'Butter', 3.80, 51.1090, 17.0450),
-        ('Biedronka', 'Olive Oil', 5.20, 51.1090, 17.0450),
-        ('Biedronka', 'Salt', 0.90, 51.1090, 17.0450),
-        ('Biedronka', 'Pepper', 1.80, 51.1090, 17.0450),
-        ('Biedronka', 'Rice', 3.20, 51.1090, 17.0450),
-        ('Biedronka', 'Pasta', 2.10, 51.1090, 17.0450),
-        ('Biedronka', 'Tomatoes', 3.80, 51.1090, 17.0450),
-        ('Biedronka', 'Garlic', 1.70, 51.1090, 17.0450),
-        ('Biedronka', 'Onions', 2.00, 51.1090, 17.0450),
-        ('Biedronka', 'Carrots', 1.50, 51.1090, 17.0450),
-        ('Biedronka', 'Potatoes', 1.20, 51.1090, 17.0450),
-        ('Biedronka', 'Chicken Breast', 7.50, 51.1090, 17.0450),
-        ('Biedronka', 'Beef', 9.80, 51.1090, 17.0450),
-        ('Biedronka', 'Pork', 6.50, 51.1090, 17.0450),
-        ('Biedronka', 'Fish', 5.60, 51.1090, 17.0450),
-        ('Biedronka', 'Cheese', 4.20, 51.1090, 17.0450),
-        ('Lidl', 'Flour', 2.60, 51.1150, 17.0300),
-        ('Lidl', 'Sugar', 1.90, 51.1150, 17.0300),
-        ('Lidl', 'Eggs', 3.40, 51.1150, 17.0300),
-        ('Lidl', 'Milk', 1.60, 51.1150, 17.0300),
-        ('Lidl', 'Butter', 4.20, 51.1150, 17.0300),
-        ('Lidl', 'Olive Oil', 5.70, 51.1150, 17.0300),
-        ('Lidl', 'Salt', 1.10, 51.1150, 17.0300),
-        ('Lidl', 'Pepper', 2.00, 51.1150, 17.0300),
-        ('Lidl', 'Rice', 3.30, 51.1150, 17.0300),
-        ('Lidl', 'Pasta', 2.40, 51.1150, 17.0300),
-        ('Lidl', 'Tomatoes', 4.10, 51.1150, 17.0300),
-        ('Lidl', 'Garlic', 1.80, 51.1150, 17.0300),
-        ('Lidl', 'Onions', 2.10, 51.1150, 17.0300),
-        ('Lidl', 'Carrots', 1.70, 51.1150, 17.0300),
-        ('Lidl', 'Potatoes', 1.40, 51.1150, 17.0300),
-        ('Lidl', 'Chicken Breast', 8.30, 51.1150, 17.0300),
-        ('Lidl', 'Beef', 10.20, 51.1150, 17.0300),
-        ('Lidl', 'Pork', 7.40, 51.1150, 17.0300),
-        ('Lidl', 'Fish', 5.90, 51.1150, 17.0300),
-        ('Lidl', 'Cheese', 4.60, 51.1150, 17.0300);
+    def create_blank(self):
+        """Create and populate the 'prices' table."""
+        create_table_query = """
+        CREATE TABLE IF NOT EXISTS prices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            store TEXT NOT NULL,
+            item TEXT NOT NULL,
+            price REAL NOT NULL,
+            lat REAL NOT NULL,
+            lon REAL NOT NULL
+        );
         """
-
-        # Execute the query to insert data
-        cur.execute(insert_query)
-        con.commit()  # Save the changes to the database
-
-        # Close the connection
-
-
-         #remove dupes
-        CMD = """
-        DELETE FROM prices
-        WHERE rowid NOT IN (
-        SELECT MIN(rowid)
+        self.execute_query(create_table_query)
+    #region -------- GET ITEMS --------
+    def get_item(self, store, item):
+        """Retrieve an item from the 'prices' table."""
+        select_query = """
+        SELECT DISTINCT store, item, price, lat, lon
         FROM prices
-        GROUP BY store, item, price, lat, lon);
+        WHERE store = ? AND item = ?;
         """
-        cur.execute(CMD)
-        con.commit()  # Save the changes to the database
-        cur.close()
-        con.close()
+        rows = self.execute_query(select_query, (store, item), fetch=True)
 
+        # Convert each row to a dictionary before returning
+        result = [dict(row) for row in rows] if rows else []
+        return result
+
+    def get_items(self, items):
+        """Retrieve multiple items from the 'prices' table."""
+        results = []
+        for item in items:
+            store = item.get("store")
+            item_name = item.get("item")
+            result = self.get_item(store, item_name)
+            if result:
+                results.extend(result)
+        return results
+    
+    def add_recipe(self, username, recipe_name, items, total_price):
+        """Adds a recipie to the user recipie table 'UserRecipes' """
+
+        execute_query = '''
+        INSERT INTO UserRecipes (username, recipe_name, items, total_price)
+        VALUES (?, ?, ?, ?)'''
+
+        self.execute_query(execute_query, (username, recipe_name, items, total_price), fetch=False)
+
+    def retrieve_recipe(self, username, recipe_name):
+        """Retrieves a recipe based on username and recipe name."""
+        query = '''
+        SELECT * FROM UserRecipes 
+        WHERE username = ? AND recipe_name = ?
+        '''
+        result = self.execute_query(query, (username, recipe_name), fetch=True)
+
+        if result:
+            recipe = result[0]  # If found, return the first result (since it's unique)
+            return {
+                "username": recipe["username"],
+                "recipe_name": recipe["recipe_name"],
+                "items": recipe["items"],
+                "total_price": recipe["total_price"]
+            }
+        else:
+            return None  # If no recipe is found
         
 
-    
-        
 
-        
+    #endregion
+#region -------- Init database
+# Initialize the database
+db = Database()
+db.create_blank()
+#endregion
+#region -------- Flask app routes --------
 
-class Measure():
-    """This class is designed for measuring distance and cost by travel time"""
-    def __init__(self):
-        """NSTR"""
-        pass
+# Find the cheapest recipie 
+@app.route('/find-cheapest', methods=['POST'])
+def find_cheapest():
+    data = request.json
+    items = data.get('items', [])
+
+    results = []
+    for item in items:
+        store = item.get('store')
+        ingredient_name = item.get('ingredient')
+        quantity = float(item.get('quantity'))
+
+        # Query the database for the item in the specified store
+        items_in_store = db.get_item(store, ingredient_name)  # Assuming this method exists
+        if items_in_store:
+            # Find the cheapest item for the ingredient in the given store
+            cheapest_item = min(items_in_store, key=lambda x: x['price'])
+
+            # Calculate total cost for the requested quantity
+            total_cost = cheapest_item['price'] * quantity
+            results.append({
+                'ingredient': ingredient_name,
+                'quantity': f"{quantity} kg",
+                'costPerItem': cheapest_item['price'],
+                'totalCost': total_cost,
+                'store': cheapest_item['store'],
+                'travelTime': "10 min"  # Or you could calculate this based on lat/lon
+            })
+        else:
+            results.append({
+                'ingredient': ingredient_name,
+                'quantity': f"{quantity} kg",
+                'costPerItem': "N/A",
+                'totalCost': "N/A",
+                'store': store,
+                'travelTime': "N/A"
+            })
+
+    return jsonify({'results': results})
+
+# Get an item
+@app.route('/get-item', methods=['POST'])
+def get_item():
+    data = request.json
+    if not data:
+        return jsonify({"error": "Invalid JSON data, no data received"}), 400  # Return error if no JSON data is found
     
-    def GetDist(lat1, lon1, lat2, lon2):
-        """use the haversine to get P2P distance between two points"""
-        # Convert latitude and longitude from degrees to radians
-        lat1 = math.radians(lat1)
-        lon1 = math.radians(lon1)
-        lat2 = math.radians(lat2)
-        lon2 = math.radians(lon2)
+    print("Received data:", data)  # Debugging: Check the received data
     
-        # Calculate the distance using the spherical law of cosines formula
-        distance = math.acos(math.sin(lat1) * math.sin(lat2)
-                             + math.cos(lat1) * math.cos(lat2)
-                             * math.cos(lon2 - lon1)) * 6371  # Radius of Earth in KM
-    
-        return distance
+    try:
+        items = data.get("items", [])
         
-x = database()
-x.CreateBlank()
-    
+        if not items:
+            return jsonify({"error": "No items provided in the request"}), 400
+        
+        # Check for missing store or item in each object in the items array
+        for item in items:
+            if not item.get("store") or not item.get("item"):
+                return jsonify({"error": "Store or item missing in one of the items"}), 400
+        
+        # Get results for all items
+        result = db.get_items(items)
+        
+        if result:
+            return jsonify({"data": result}), 200
+        else:
+            return jsonify({"message": "Items not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+# add a recipie 
+@app.route('/add-recipe', methods=['POST'])
+def add_recipe():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "Invalid JSON data, no data received"}), 400
+        
+        username = data.get("username")
+        recipe_name = data.get("recipe_name")
+        items = data.get("items")
+        total_price = data.get("total_price")
+
+        if not username or not recipe_name or not items or not total_price:
+            return jsonify({"error": "Missing required fields: username, recipe_name, items, or total_price"}), 400
+        
+        # Add recipe to the database
+        db.add_recipe(username, recipe_name, items, total_price)
+        return jsonify({"message": "Recipe added successfully"}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# retrieve a recipe
+@app.route('/retrieve-recipe', methods=['GET'])
+def retrieve_recipe():
+    try:
+        # Extract query parameters
+        username = request.args.get("username")
+        recipe_name = request.args.get("recipe_name")
+
+        if not username or not recipe_name:
+            return jsonify({"error": "Missing required query parameters: username or recipe_name"}), 400
+        
+        # Retrieve the recipe from the database
+        recipe = db.retrieve_recipe(username, recipe_name)
+
+        if recipe:
+            return jsonify({"recipe": recipe}), 200
+        else:
+            return jsonify({"message": "Recipe not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+#endregion
+#region -------- Run Program --------
+if __name__ == "__main__":
+    app.run(debug=True)
+#endregion
