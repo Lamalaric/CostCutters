@@ -34,27 +34,30 @@ document.addEventListener('DOMContentLoaded', function () {
 		resultsContainer.classList.remove('hidden'); // Show the results table
 	});
 	//Add a row in the find recipe table
-	document.getElementById('add-row-button').addEventListener('click', function () {
-		const tableBody = document.getElementById('ingredient-rows');
-		const newRow = document.createElement('tr');
+	// Add event listener to the "add-row-button" button
+	document.getElementById("add-row-button").addEventListener("click", function() {
+		const ingredientRows = document.getElementById("ingredient-rows");
+		
+		// Create a new row with the same structure as the previous rows
+		const newRow = document.createElement("tr");
 
-		const ingredientCell = document.createElement('td');
-		const ingredientInput = document.createElement('input');
-		ingredientInput.type = 'text';
-		ingredientInput.placeholder = 'Ingredient';
-		ingredientCell.appendChild(ingredientInput);
-
-		const quantityCell = document.createElement('td');
-		const quantityInput = document.createElement('input');
-		quantityInput.type = 'number';
-		quantityInput.placeholder = 'Quantity';
-		quantityCell.appendChild(quantityInput);
-
+		const storeCell = document.createElement("td");
+		storeCell.innerHTML = '<input type="text" placeholder="Store">';
+		
+		const ingredientCell = document.createElement("td");
+		ingredientCell.innerHTML = '<input type="text" placeholder="Ingredient">';
+		
+		const quantityCell = document.createElement("td");
+		quantityCell.innerHTML = '<input type="number" placeholder="Quantity">';
+		
+		newRow.appendChild(storeCell);
 		newRow.appendChild(ingredientCell);
 		newRow.appendChild(quantityCell);
-
-		tableBody.appendChild(newRow);
+		
+		// Append the new row to the table body
+		ingredientRows.appendChild(newRow);
 	});
+
 
 	//Show the table of details of a recipe
 	document.querySelectorAll('.recipe-link').forEach(link => {
@@ -112,4 +115,69 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 
+
+	// ISSUE GRADE 1, SAVE BUTTON HAVING ISSUES DUE TO CORS POLICY
+	document.getElementById("save-button").addEventListener("click", function () {
+		const rows = document.querySelectorAll("#ingredient-rows tr");
+		let items = [];
+	
+		// Collect ingredient, store, and quantity values from each row
+		rows.forEach(row => {
+			const inputs = row.querySelectorAll("input");
+			const store = inputs[0].value.trim();
+			const ingredient = inputs[1].value.trim();
+			const quantity = parseFloat(inputs[2].value.trim());
+	
+			if (store && ingredient && !isNaN(quantity)) {
+				items.push({
+					store: store,
+					ingredient: ingredient,
+					quantity: quantity
+				});
+			} else {
+				console.error("Invalid row data:", { store, ingredient, quantity });
+			}
+		});
+	
+		if (items.length === 0) {
+			alert("No valid ingredients to save.");
+			return;
+		}
+	
+		// Calculate total price (just as an example)
+		const totalPrice = items.reduce((total, item) => total + item.quantity * 2.5, 0).toFixed(2);
+	
+		const data = {
+			username: "test_user", // You can replace this with dynamic input if needed
+			recipe_name: "Sample Recipe", // Replace with a user-provided recipe name
+			items: items,
+			total_price: totalPrice
+		};
+	
+		console.log("Data being sent to backend:", data);
+	
+		fetch('/add-recipe', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(err => Promise.reject(err));
+			}
+			return response.json();
+		})
+		.then(result => {
+			console.log(result.message);
+			alert("Recipe saved successfully!");
+		})
+		.catch(error => {
+			console.error("Error saving recipe:", error);
+			alert("Failed to save recipe. Check console for details.");
+		});
+	});
+
 });
+
