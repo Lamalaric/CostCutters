@@ -84,7 +84,7 @@
             </div>
             <ul class="nav-links" id="nav-links">
                 <li><a href="#">Home</a></li>
-                <li><a href="#">Find ingredients</a></li>
+                <li><a href="#targetCheapest">Find ingredients</a></li>
                 <li><a href="#">Recipes</a></li>
                 <li><a href="#">Contact</a></li>
             </ul>
@@ -94,6 +94,7 @@
 
 <!-- MAIN SCREEN -->
 <main class="homepage">
+    <!-- #region main stuff -->
     <section class="container">
         <div class="my-recipes">
             <h2>MY RECIPES</h2>
@@ -121,11 +122,11 @@
                 </ul>
                 <a href="#">CLICK TO GO TO RECIPE</a>
             </div>
-            <h2>BLOG</h2>
+            <h2 style="padding: 10px;">BLOG</h2>
             <div class="blog-post">
                 <img src="images/sample_image.png" alt="TBD">
                 <h3>RECIPE 2</h3>
-                <ul>
+                <ul id="targetCheapest">
                     <li>xxxkCAL</li>
                     <li>Quick (5-10 minutes)</li>
                     <li>Cheap (20PLN/PP)</li>
@@ -134,9 +135,10 @@
             </div>
         </div>
     </section>
+    <!-- #endregion -->
 
     <!-- SECOND SCREEN -->
-    <section class="find-cheapest">
+    <section class="find-cheapest" >
         <h1>Find the cheapest ingredients</h1>
         <div class="input-table-container">
             <table class="input-table">
@@ -153,17 +155,15 @@
                         <td><input type="text" placeholder="Ingredient"></td>
                         <td><input type="number" placeholder="Quantity"></td>
                     </tr>
-                    <tr>
-                        <td><input type="text" placeholder="Store"></td>
-                        <td><input type="text" placeholder="Ingredient"></td>
-                        <td><input type="number" placeholder="Quantity"></td>
-                    </tr>
+              
                 </tbody>
             </table>
             <div class="btn-container">
                 <button id="add-row-button">+</button>
                 <button id="find-button">Find</button>
-                <button id="save-button">Save to File</button>
+                <button id="save-button" >Save recipe</button>
+
+                
             </div>
         </div>
     
@@ -188,30 +188,7 @@
     </section> 
     <!-- ingredient handler with ajax hook to flask -->
     <script>
-        // Add event listener to the "add-row-button" button
-        document.getElementById("add-row-button").addEventListener("click", function() {
-            const ingredientRows = document.getElementById("ingredient-rows");
-            
-            // Create a new row with the same structure as the previous rows
-            const newRow = document.createElement("tr");
-    
-            const storeCell = document.createElement("td");
-            storeCell.innerHTML = '<input type="text" placeholder="Store">';
-            
-            const ingredientCell = document.createElement("td");
-            ingredientCell.innerHTML = '<input type="text" placeholder="Ingredient">';
-            
-            const quantityCell = document.createElement("td");
-            quantityCell.innerHTML = '<input type="number" placeholder="Quantity">';
-            
-            newRow.appendChild(storeCell);
-            newRow.appendChild(ingredientCell);
-            newRow.appendChild(quantityCell);
-            
-            // Append the new row to the table body
-            ingredientRows.appendChild(newRow);
-        });
-    
+        
         // Add event listener for the "find-button" to handle the search functionality
         document.getElementById("find-button").addEventListener("click", function() {
             const rows = document.querySelectorAll("#ingredient-rows tr");
@@ -253,63 +230,10 @@
             });
         });
     </script>
-    <!-- save button listener-->
-    <script>
-        document.getElementById('save-recipe-button').addEventListener('click', function() {
-            // Gather data from the form
-            const username = document.getElementById('username').value;
-            const recipeName = document.getElementById('recipe-name').value;
-            const item1 = document.getElementById('item-1').value;
-            const quantity1 = document.getElementById('quantity-1').value;
-            const item2 = document.getElementById('item-2').value;
-            const quantity2 = document.getElementById('quantity-2').value;
-            const totalPrice = document.getElementById('total-price').value;
-    
-            // Check if necessary fields are filled out
-            if (!username || !recipeName || !item1 || !quantity1 || !totalPrice) {
-                alert("Please fill out all required fields!");
-                return;
-            }
-    
-            // Prepare the list of ingredients for the recipe
-            const items = [
-                { store: "StoreName", item: item1, quantity: quantity1 },
-                { store: "StoreName", item: item2, quantity: quantity2 }
-            ];
-    
-            // Create an object for the recipe data
-            const recipeData = {
-                username: username,
-                recipe_name: recipeName,
-                items: items,
-                total_price: totalPrice
-            };
-    
-            // Send the recipe data to the backend (Flask API)
-            fetch('http://127.0.0.1:5000/add-recipe', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(recipeData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    alert(data.message);
-                } else {
-                    alert("Error: " + data.error);
-                }
-            })
-            .catch(error => {
-                alert("Error: " + error.message);
-            });
-        });
-    </script>
     
     
     
-    <!-- THIRD SCREEN -->
+    <!-- #region THIRD SCREEN  -->
     <section class="recipe-container">
         <h1>Recipes</h1>
         <div class="recipe-cards">
@@ -366,6 +290,8 @@
                 </div>
             </div>
         </div>
+        <!-- #endregion -->
+
         <!-- RECIPIE SCREEN -->
         <div id="recipe-details" class="recipe-details-block">
             <div class="recipe-table-container">
