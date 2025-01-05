@@ -116,68 +116,146 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 
 
-	// ISSUE GRADE 1, SAVE BUTTON HAVING ISSUES DUE TO CORS POLICY
-	document.getElementById("save-button").addEventListener("click", function () {
-		const rows = document.querySelectorAll("#ingredient-rows tr");
-		let items = [];
-	
-		// Collect ingredient, store, and quantity values from each row
-		rows.forEach(row => {
-			const inputs = row.querySelectorAll("input");
-			const store = inputs[0].value.trim();
-			const ingredient = inputs[1].value.trim();
-			const quantity = parseFloat(inputs[2].value.trim());
-	
-			if (store && ingredient && !isNaN(quantity)) {
-				items.push({
-					store: store,
-					ingredient: ingredient,
-					quantity: quantity
-				});
-			} else {
-				console.error("Invalid row data:", { store, ingredient, quantity });
-			}
-		});
-	
-		if (items.length === 0) {
-			alert("No valid ingredients to save.");
-			return;
-		}
-	
-		// Calculate total price (just as an example)
-		const totalPrice = items.reduce((total, item) => total + item.quantity * 2.5, 0).toFixed(2);
-	
-		const data = {
-			username: "test_user", // You can replace this with dynamic input if needed
-			recipe_name: "Sample Recipe", // Replace with a user-provided recipe name
-			items: items,
-			total_price: totalPrice
-		};
-	
-		console.log("Data being sent to backend:", data);
-	
-		fetch('/add-recipe', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(data)
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(err => Promise.reject(err));
-			}
-			return response.json();
-		})
-		.then(result => {
-			console.log(result.message);
-			alert("Recipe saved successfully!");
-		})
-		.catch(error => {
-			console.error("Error saving recipe:", error);
-			alert("Failed to save recipe. Check console for details.");
-		});
-	});
+	// Save Button Event Listener
+document.getElementById("save-button").addEventListener("click", function () {
+    const rows = document.querySelectorAll("#ingredient-rows tr");
+    let items = [];
 
+    // Collect ingredient, store, and quantity values from each row
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        const store = inputs[0].value.trim();
+        const ingredient = inputs[1].value.trim();
+        const quantity = parseFloat(inputs[2].value.trim());
+
+        if (store && ingredient && !isNaN(quantity)) {
+            items.push({
+                store: store,
+                ingredient: ingredient,
+                quantity: quantity
+            });
+        } else {
+            console.error("Invalid row data:", { store, ingredient, quantity });
+        }
+    });
+
+    if (items.length === 0) {
+        alert("No valid ingredients to save.");
+        return;
+    }
+
+    // Calculate total price (example: assuming $2.5 per unit)
+    const totalPrice = items.reduce((total, item) => total + item.quantity * 2.5, 0).toFixed(2);
+
+    const data = {
+        username: "test_user", // Replace with dynamic input if needed
+        recipe_name: "Sample Recipe", // Replace with a user-provided recipe name
+        items: items,
+        total_price: totalPrice
+    };
+
+    console.log("Data being sent to backend:", data);
+
+    fetch('/add-recipe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(result => {
+        console.log(result.message);
+        alert("Recipe saved successfully!");
+    })
+    .catch(error => {
+        console.error("Error saving recipe:", error);
+        alert("Failed to save recipe. Check console for details.");
+    });
 });
+
+// Function to submit the form and fetch results from the server
+async function submitForm() {
+    const ingredients = [];
+    const rows = document.querySelectorAll("#ingredient-rows tr");
+
+    // Collect ingredient, store, and quantity values from each row
+    for (const row of rows) {
+        const inputs = row.querySelectorAll("input");
+
+        if (inputs.length === 3) { // Ensure there are exactly 3 inputs per row
+            const store = inputs[0].value.trim();
+            const ingredient = inputs[1].value.trim();
+            const quantity = parseFloat(inputs[2].value.trim());
+
+            // Validate that store, ingredient, and quantity are filled
+            if (store && ingredient && !isNaN(quantity)) {
+                ingredients.push({ store, ingredient, quantity });
+            } else {
+                alert("Each row must have a store, ingredient, and valid quantity.");
+                return; // Stop submission if any row is incomplete
+            }
+        } else {
+            alert("Invalid row format. Each row must have store, ingredient, and quantity inputs.");
+            return;
+        }
+    }
+
+    // Send data to the server
+    try {
+        const response = await fetch('http://127.0.0.1:5000/find-cheapest', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ items: ingredients }) // Align with Python's expected input structure
+        });
+
+        const data = await response.json();
+        if (data.results) {
+            displayResults(data.results);
+        } else {
+            alert("Error: " + (data.error || data.message || "Unknown error occurred."));
+        }
+    } catch (error) {
+        console.log("Request failed:", error);
+        alert("Error: " + error.message);
+    }
+}
+
+// Function to display the results in the results table
+function displayResults(items) {
+    const resultsBody = document.getElementById("results-body");
+    resultsBody.innerHTML = ""; // Clear previous results
+
+    items.forEach(item => {
+        const row = document.createElement("tr");
+
+        // Add columns for each data field
+        row.innerHTML = `
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.ingredient}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.quantity}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.costPerItem}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.totalCost.toFixed(2)}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.store}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.travelTime}</td>
+        `;
+        resultsBody.appendChild(row);
+    });
+
+    // Show the results container
+    document.getElementById("results-container").style.display = "block";
+}
+
+
+    // Event listener for the "Find" button
+    document.getElementById("find-button").addEventListener("click", submitForm);
+});
+
+
 
