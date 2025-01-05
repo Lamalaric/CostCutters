@@ -111,7 +111,7 @@ db.create_blank()
 #endregion
 #region -------- Flask app routes --------
 
-# Find the cheapest recipie 
+# Find the cheapest recipie
 @app.route('/find-cheapest', methods=['POST'])
 def find_cheapest():
     data = request.json
@@ -119,39 +119,52 @@ def find_cheapest():
 
     results = []
     for item in items:
-        store = item.get('store')
         ingredient_name = item.get('ingredient')
         quantity = float(item.get('quantity'))
+        store = item.get('store')  # Store can be None or missing
 
-        # Query the database for the item in the specified store
-        items_in_store = db.get_item(store, ingredient_name)  # Assuming this method exists
+        items_in_store = []
+        
+        # If store is provided, query that specific store for the ingredient
+        if store:
+            items_in_store = db.get_item(store, ingredient_name)
+        else:
+            # If no store is provided, query all stores for the ingredient
+            select_query = """
+            SELECT DISTINCT store, item, price, lat, lon
+            FROM prices
+            WHERE item = ?;
+            """
+            rows = db.execute_query(select_query, (ingredient_name,), fetch=True)
+            items_in_store = [dict(row) for row in rows] if rows else []
+
         if items_in_store:
-            # Find the cheapest item for the ingredient in the given store
+            # Find the cheapest item in the available stores (if multiple stores)
             cheapest_item = min(items_in_store, key=lambda x: x['price'])
 
             # Calculate total cost for the requested quantity
             total_cost = cheapest_item['price'] * quantity
+
             results.append({
                 'ingredient': ingredient_name,
                 'quantity': f"{quantity} kg",
                 'costPerItem': cheapest_item['price'],
                 'totalCost': total_cost,
                 'store': cheapest_item['store'],
-                'travelTime': "10 min"  # Or you could calculate this based on lat/lon
+                'travelTime': "10 min"  # Default travel time (this could be dynamically calculated based on lat/lon)
             })
         else:
+            # If no item found, append a result indicating the item is unavailable
             results.append({
                 'ingredient': ingredient_name,
                 'quantity': f"{quantity} kg",
                 'costPerItem': "N/A",
                 'totalCost': "N/A",
-                'store': store,
+                'store': store if store else "N/A",  # If store is provided, show it; otherwise show N/A
                 'travelTime': "N/A"
             })
 
-    print("Returned" + str(results))
     return jsonify({'results': results})
-
 # Get an item
 @app.route('/get-item', methods=['POST'])
 def get_item():
