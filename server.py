@@ -1,3 +1,6 @@
+
+# THIS IS DEPRECIATED PLEASE USE DBMGS.py in scripts not this 
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
