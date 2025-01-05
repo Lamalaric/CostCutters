@@ -179,7 +179,24 @@ document.getElementById("save-button").addEventListener("click", function () {
     });
 });
 
-// Function to submit the form and fetch results from the server
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 async function submitForm() {
     const ingredients = [];
     const rows = document.querySelectorAll("#ingredient-rows tr");
@@ -188,23 +205,26 @@ async function submitForm() {
     for (const row of rows) {
         const inputs = row.querySelectorAll("input");
 
-        if (inputs.length === 3) { // Ensure there are exactly 3 inputs per row
-            const store = inputs[0].value.trim();
+        if (inputs.length >= 2) {  // Ensure there are at least 2 inputs (store and ingredient, store is optional)
+            const store = inputs[0] ? inputs[0].value.trim() : "";  // Store can be empty
             const ingredient = inputs[1].value.trim();
             const quantity = parseFloat(inputs[2].value.trim());
 
-            // Validate that store, ingredient, and quantity are filled
-            if (store && ingredient && !isNaN(quantity)) {
-                ingredients.push({ store, ingredient, quantity });
+            // Validate that ingredient and quantity are filled, store is optional
+            if (ingredient && !isNaN(quantity)) {
+                ingredients.push({ store, ingredient, quantity }); // Store can be an empty string
             } else {
-                alert("Each row must have a store, ingredient, and valid quantity.");
+                alert("Each row must have an ingredient and valid quantity.");
                 return; // Stop submission if any row is incomplete
             }
         } else {
-            alert("Invalid row format. Each row must have store, ingredient, and quantity inputs.");
+            alert("Invalid row format. Each row must have ingredient and quantity inputs.");
             return;
         }
     }
+
+    // Log the data being sent to the backend
+    console.log("Ingredients to be sent:", ingredients);
 
     // Send data to the server
     try {
@@ -217,6 +237,8 @@ async function submitForm() {
         });
 
         const data = await response.json();
+        console.log("Response from server:", data); // Log the response
+
         if (data.results) {
             displayResults(data.results);
         } else {
@@ -236,12 +258,17 @@ function displayResults(items) {
     items.forEach(item => {
         const row = document.createElement("tr");
 
+        // Check if totalCost is a valid number before calling toFixed
+        const totalCost = (typeof item.totalCost === "number" && !isNaN(item.totalCost)) 
+            ? item.totalCost.toFixed(2) 
+            : "N/A";  // If not a valid number, set as N/A
+
         // Add columns for each data field
         row.innerHTML = `
             <td style="border: 1px solid #ddd; padding: 8px;">${item.ingredient}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.quantity}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.costPerItem}</td>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.totalCost.toFixed(2)}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${totalCost}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.store}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.travelTime}</td>
         `;
@@ -253,8 +280,11 @@ function displayResults(items) {
 }
 
 
-    // Event listener for the "Find" button
-    document.getElementById("find-button").addEventListener("click", submitForm);
+// Event listener for the "Find" button
+document.getElementById("find-button").addEventListener("click", (event) => {
+    event.preventDefault();  // Prevent default form submission (if any)
+    submitForm();  // Trigger the form submission process
+});
 });
 
 

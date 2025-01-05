@@ -2,8 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
 import json  # For handling the list of items in JSON format
-import logging
-
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -98,59 +96,22 @@ db.create_blank()
 
 # Flask Routes
 
-
 @app.route('/add-recipe', methods=['POST'])
 def add_recipe():
+    data = request.json
     try:
-        data = request.json
-        logging.info(f"Received data: {data}")
-
         username = data.get("username")
         recipe_name = data.get("recipe_name")
-        items = data.get("items")
-        total_price = data.get("total_price")
+        items = data.get("items")  # This should be a list of items
+        total_price = float(data.get("total_price"))
 
         if not username or not recipe_name or not items or total_price is None:
-            logging.error("Missing required fields")
             return jsonify({"error": "Missing required fields"}), 400
-
-        # Check the data types
-        if not isinstance(username, str):
-            logging.error("Invalid username type")
-            return jsonify({"error": "Invalid username type"}), 400
-
-        if not isinstance(recipe_name, str):
-            logging.error("Invalid recipe_name type")
-            return jsonify({"error": "Invalid recipe_name type"}), 400
-
-        if not isinstance(items, list):
-            logging.error("Items must be a list")
-            return jsonify({"error": "Items must be a list"}), 400
-
-        if not isinstance(total_price, (float, int)):
-            logging.error("Total price must be a number")
-            return jsonify({"error": "Total price must be a number"}), 400
-
-        # Check each item in the list
-        for item in items:
-            if not isinstance(item, dict):
-                logging.error("Each item must be a dictionary")
-                return jsonify({"error": "Each item must be a dictionary"}), 400
-
-            if not all(k in item for k in ["store", "ingredient", "quantity"]):
-                logging.error("Each item must contain 'store', 'ingredient', and 'quantity'")
-                return jsonify({"error": "Missing keys in item"}), 400
-
-        # Simulate saving to DB
-        logging.info(f"Saving recipe for user: {username}")
+        
         db.add_recipe(username, recipe_name, items, total_price)
-
         return jsonify({"message": "Recipe added successfully!"}), 201
-
     except Exception as e:
-        logging.error(f"Exception occurred: {e}")
         return jsonify({"error": str(e)}), 400
-
 
 @app.route('/get-recipes', methods=['POST'])
 def get_recipes():
