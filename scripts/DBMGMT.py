@@ -149,6 +149,7 @@ def find_cheapest():
                 'travelTime': "N/A"
             })
 
+    print("Returned" + str(results))
     return jsonify({'results': results})
 
 # Get an item
