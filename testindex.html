@@ -187,49 +187,7 @@
         </div>
     </section> 
     <!-- ingredient handler with ajax hook to flask -->
-    <script>
-        
-        // Add event listener for the "find-button" to handle the search functionality
-        document.getElementById("find-button").addEventListener("click", function() {
-            const rows = document.querySelectorAll("#ingredient-rows tr");
-            let ingredients = [];
-    
-            // Collect ingredient, store, and quantity values from each row
-            rows.forEach(row => {
-                const inputs = row.querySelectorAll("input");
-                const store = inputs[0].value.trim();
-                const ingredient = inputs[1].value.trim();
-                const quantity = inputs[2].value.trim();
-    
-                if (store && ingredient && quantity) {
-                    ingredients.push({ store, ingredient, quantity });
-                }
-            });
-    
-            // Display results (for now, this just logs the collected ingredients)
-            console.log("Ingredients collected:", ingredients);
-    
-            // You can replace this with actual functionality to search for prices, etc.
-            document.getElementById("results-container").style.display = "block";
-            
-            // Example: Populate the results table
-            const resultsBody = document.getElementById("results-body");
-            resultsBody.innerHTML = ""; // Clear previous results
-    
-            ingredients.forEach(item => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${item.ingredient}</td>
-                    <td>${item.quantity}</td>
-                    <td>2.50</td> <!-- Example price -->
-                    <td>${(2.50 * item.quantity).toFixed(2)}</td> <!-- Total Cost -->
-                    <td>${item.store}</td>
-                    <td>10 minutes</td> <!-- Example travel time -->
-                `;
-                resultsBody.appendChild(row);
-            });
-        });
-    </script>
+
     
     
     
