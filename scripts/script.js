@@ -1,4 +1,5 @@
 // PROGRESS BAR
+//#region ignore 
 window.onload = () => {
 	// Ecouteur d'évènement sur scroll
 	window.addEventListener("scroll", () => {
@@ -14,6 +15,7 @@ window.onload = () => {
 		document.getElementById("progress").style.width = barre+"px"
 	})
 }
+//#endregion
 
 //Wait for the full DOM to be loaded...
 document.addEventListener('DOMContentLoaded', function () {
@@ -21,12 +23,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	const navLinks = document.getElementById('nav-links');
 
 
-	//BURGER MENU
+	//#region BURGER MENU
 	if (menuIcon && navLinks) {
 		menuIcon.addEventListener('click', function () {
 			navLinks.classList.toggle('active');
 		});
 	}
+	//#endregion
 
 	//Click on "Find" to display the next step table
 	document.getElementById('find-button').addEventListener('click', function () {
@@ -101,8 +104,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>${ingredient.cost}</td>
                 <td>${ingredient.totalCost}</td>
                 <td>${ingredient.store}</td>
-                <td>${ingredient.travelTime}</td>
-            `;
+                <td>${ingredient.travelTime}</td>`
+            ;
 				ingredientsList.appendChild(row);
 			});
 
@@ -116,26 +119,55 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 
 
-	// Save Button Event Listener
+
+
+
+
+
+
+
+
+
+//region save recipe 
 document.getElementById("save-button").addEventListener("click", function () {
+    // Prompt the user for their username
+    const username = prompt("Please enter your username:");
+
+    // If the username is empty or canceled, alert the user and stop the process
+    if (!username) {
+        alert("Username is required. Please enter a username.");
+        return;
+    }
+
+	const recipeName = prompt("Please enter your recipe name:");
+
+    // If the username is empty or canceled, alert the user and stop the process
+    if (!recipeName) {
+        alert("recipe name is required. Please enter a name.");
+        return;
+    }
+
     const rows = document.querySelectorAll("#ingredient-rows tr");
     let items = [];
 
     // Collect ingredient, store, and quantity values from each row
     rows.forEach(row => {
         const inputs = row.querySelectorAll("input");
-        const store = inputs[0].value.trim();
+        const store = inputs[0].value.trim();  // Store can be empty
         const ingredient = inputs[1].value.trim();
         const quantity = parseFloat(inputs[2].value.trim());
 
-        if (store && ingredient && !isNaN(quantity)) {
+        // Check if ingredient and quantity are valid
+        if (ingredient && !isNaN(quantity)) {
             items.push({
-                store: store,
+                store: store,  // Store can be empty
                 ingredient: ingredient,
                 quantity: quantity
             });
         } else {
             console.error("Invalid row data:", { store, ingredient, quantity });
+            // Optionally, alert the user about missing ingredient or invalid quantity
+            alert(`Invalid data in row: ${ingredient} - Make sure quantity is a number.`);
         }
     });
 
@@ -148,15 +180,15 @@ document.getElementById("save-button").addEventListener("click", function () {
     const totalPrice = items.reduce((total, item) => total + item.quantity * 2.5, 0).toFixed(2);
 
     const data = {
-        username: "test_user", // Replace with dynamic input if needed
-        recipe_name: "Sample Recipe", // Replace with a user-provided recipe name
+        username: username, // Use the entered username
+        recipe_name: recipeName, // Replace with a user-provided recipe name
         items: items,
         total_price: totalPrice
     };
 
     console.log("Data being sent to backend:", data);
 
-    fetch('/add-recipe', {
+    fetch('http://127.0.0.1:5000/add-recipe', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -178,6 +210,7 @@ document.getElementById("save-button").addEventListener("click", function () {
         alert("Failed to save recipe. Check console for details.");
     });
 });
+//#endregion
 
 
 
@@ -192,11 +225,7 @@ document.getElementById("save-button").addEventListener("click", function () {
 
 
 
-
-
-
-
-
+//#region Find Ingredients 
 async function submitForm() {
     const ingredients = [];
     const rows = document.querySelectorAll("#ingredient-rows tr");
@@ -270,8 +299,8 @@ function displayResults(items) {
             <td style="border: 1px solid #ddd; padding: 8px;">${item.costPerItem}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${totalCost}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.store}</td>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.travelTime}</td>
-        `;
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.travelTime}</td>`
+        ;
         resultsBody.appendChild(row);
     });
 
@@ -284,8 +313,6 @@ function displayResults(items) {
 document.getElementById("find-button").addEventListener("click", (event) => {
     event.preventDefault();  // Prevent default form submission (if any)
     submitForm();  // Trigger the form submission process
+//#endregion
 });
 });
-
-
-

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            cursor: pointer;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr.selected {
+            background-color: #cfe2f3;
+        }
+        #import-section {
+            margin-top: 20px;
+        }
+        #recipe-name, #total-cost {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #import-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #import-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recipe List</h1>
+    <table id="recipe-table">
+        <thead>
+            <tr>
+                <th>Recipe Name</th>
+                <th>Total Cost</th>
+            </tr>
+        </thead>
+        <tbody id="recipe-list">
+            <!-- Recipes will be inserted here dynamically -->
+        </tbody>
+    </table>
+
+    <div id="import-section">
+        <h3>Selected Recipe</h3>
+        <input type="text" id="recipe-name" placeholder="Recipe Name" readonly />
+        <input type="text" id="total-cost" placeholder="Total Cost" readonly />
+        <button id="import-btn" onclick="importRecipe()">Import</button>
+    </div>
+
+    <script>
+        const apiUrl = 'http://127.0.0.1:5000/get-all-recipes';
+
+        // Fetch all recipes from the API
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const recipeList = document.getElementById("recipe-list");
+
+                // Clear existing table rows if any
+                recipeList.innerHTML = '';
+
+                if (data.recipes && data.recipes.length > 0) {
+                    data.recipes.forEach(recipe => {
+                        const row = document.createElement("tr");
+
+                        // Create and append recipe name cell
+                        const nameCell = document.createElement("td");
+                        nameCell.textContent = recipe.recipe_name;
+                        row.appendChild(nameCell);
+
+                        // Create and append total cost cell
+                        const costCell = document.createElement("td");
+                        costCell.textContent = `$${recipe.total_cost.toFixed(2)}`; // Format cost to two decimal places
+                        row.appendChild(costCell);
+
+                        // Add click event to select row
+                        row.addEventListener('click', () => selectRecipe(recipe));
+
+                        // Append the row to the table body
+                        recipeList.appendChild(row);
+                    });
+                } else {
+                    // Display message when no recipes are found
+                    const row = document.createElement("tr");
+                    const cell = document.createElement("td");
+                    cell.colSpan = 2;
+                    cell.textContent = "No recipes found.";
+                    row.appendChild(cell);
+                    recipeList.appendChild(row);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching recipes:", error);
+
+                // Handle error by displaying a message in the table
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.colSpan = 2;
+                cell.textContent = "Error fetching recipes.";
+                row.appendChild(cell);
+                document.getElementById("recipe-list").appendChild(row);
+            });
+
+        // Function to handle row click and select the recipe
+        function selectRecipe(recipe) {
+            // Deselect previously selected row
+            const rows = document.querySelectorAll("#recipe-list tr");
+            rows.forEach(row => row.classList.remove("selected"));
+
+            // Highlight the selected row
+            const selectedRow = event.target.closest("tr");
+            selectedRow.classList.add("selected");
+
+            // Fill the textboxes with the recipe details
+            document.getElementById("recipe-name").value = recipe.recipe_name;
+            document.getElementById("total-cost").value = `$${recipe.total_cost.toFixed(2)}`;
+        }
+
+        // Function to simulate importing the recipe
+        function importRecipe() {
+            const recipeName = document.getElementById("recipe-name").value;
+            const totalCost = document.getElementById("total-cost").value;
+
+            if (!recipeName || !totalCost) {
+                alert("Please select a recipe to import.");
+                return;
+            }
+
+            // Example of what you might do to "import" the recipe
+            alert(`Recipe "${recipeName}" with total cost of ${totalCost} imported!`);
+        }
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
+import json
 #region Initialize Flask application
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -34,6 +35,12 @@ class Database:
             cur.close()
             con.close()
         return result
+    
+    def get_all_recipes(self):
+        """Retrieve all recipes with name and total cost."""
+        query = "SELECT recipe_name, total_price FROM UserRecipes"
+        rows = self.execute_query(query, fetch=True)
+        return [{"recipe_name": row["recipe_name"], "total_cost": row["total_price"]} for row in rows]
 
     def create_blank(self):
         """Create and populate the 'prices' table."""
@@ -49,28 +56,41 @@ class Database:
         """
         self.execute_query(create_table_query)
     #region -------- GET ITEMS --------
-    def get_item(self, store, item):
-        """Retrieve an item from the 'prices' table."""
-        select_query = """
-        SELECT DISTINCT store, item, price, lat, lon
-        FROM prices
-        WHERE store = ? AND item = ?;
+    def add_recipe(self, username, recipe_name, items_json, total_price):
+        """Add a new recipe to the database."""
+        insert_query = """
+        INSERT INTO recipes (username, recipe_name, items, total_price)
+        VALUES (?, ?, ?, ?)
         """
-        rows = self.execute_query(select_query, (store, item), fetch=True)
+        self.execute_query(insert_query, (username, recipe_name, items_json, total_price))
 
-        # Convert each row to a dictionary before returning
-        result = [dict(row) for row in rows] if rows else []
-        return result
-
+    
     def get_items(self, items):
         """Retrieve multiple items from the 'prices' table."""
         results = []
         for item in items:
             store = item.get("store")
             item_name = item.get("item")
-            result = self.get_item(store, item_name)
+            
+            # Corrected to use execute_query to retrieve items directly without calling get_item()
+            if store:
+                # Query for a specific store
+                select_query = """
+                SELECT * FROM prices
+                WHERE store = ? AND item = ?;
+                """
+                result = self.execute_query(select_query, (store, item_name), fetch=True)
+            else:
+                # Query for all stores if no store is provided
+                select_query = """
+                SELECT * FROM prices
+                WHERE item = ?;
+                """
+                result = self.execute_query(select_query, (item_name,), fetch=True)
+            
             if result:
-                results.extend(result)
+                results.extend(result)  # Add the found items to the results
+        
         return results
     
     def add_recipe(self, username, recipe_name, items, total_price):
@@ -100,6 +120,24 @@ class Database:
             }
         else:
             return None  # If no recipe is found
+    def find_cheapest(self, store, ingredient_name):
+        """Finds the cheapest price for an ingredient at a given store."""
+        # Assuming db.get_items works and returns a list of items matching the store and ingredient_name
+        items_in_store = db.get_items([{"store": store, "item": ingredient_name}])  # Corrected method usage
+
+        if not items_in_store:
+            return {"error": "No items found for the given store and ingredient."}, 404
+        
+        # Find the item with the lowest price
+        cheapest_item = min(items_in_store, key=lambda x: x['price'])
+
+        return {
+            "store": cheapest_item["store"],
+            "ingredient": cheapest_item["ingredient"],
+            "price": cheapest_item["price"],
+            "lat": cheapest_item["lat"],
+            "lon": cheapest_item["lon"]
+    }
         
 
 
@@ -127,7 +165,7 @@ def find_cheapest():
         
         # If store is provided, query that specific store for the ingredient
         if store:
-            items_in_store = db.get_item(store, ingredient_name)
+            items_in_store = db.get_items([{"store": store, "item": ingredient_name}])
         else:
             # If no store is provided, query all stores for the ingredient
             select_query = """
@@ -211,8 +249,11 @@ def add_recipe():
         if not username or not recipe_name or not items or not total_price:
             return jsonify({"error": "Missing required fields: username, recipe_name, items, or total_price"}), 400
         
-        # Add recipe to the database
-        db.add_recipe(username, recipe_name, items, total_price)
+        # Serialize the items list to a JSON string
+        items_json = json.dumps(items)
+
+        # Add recipe to the database (you need to adjust the DB method to handle this)
+        db.add_recipe(username, recipe_name, items_json, total_price)
         return jsonify({"message": "Recipe added successfully"}), 201
 
     except Exception as e:
@@ -240,6 +281,18 @@ def retrieve_recipe():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/get-all-recipes', methods=['GET'])
+def get_all_recipes():
+    try:
+        # Fetch all recipes
+        recipes = db.get_all_recipes()
+
+        if recipes:
+            return jsonify({"recipes": recipes}), 200
+        else:
+            return jsonify({"message": "No recipes found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 #endregion
 #region -------- Run Program --------
 if __name__ == "__main__":
