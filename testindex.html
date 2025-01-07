@@ -93,13 +93,7 @@
     <!-- #region main stuff -->
     <section class="container">
         <div class="my-recipes">
-            <h2>MY RECIPES</h2>
-            <ul>
-                <li>'Pierogi' - 25PLN</li>
-                <li>'Beans on toast' - 10PLN</li>
-                <li>'Zabka hotdog' - 6PLN</li>
-                <li>'Strawberry jam' - 10PLN</li>
-            </ul>
+            <h2>Quick menu</h2>
             <div class="recipes-btn">
                 <a href="#find">CREATE A RECIPE</a>
                 <a href="#load">LOAD A SAVED RECIPE</a>
@@ -107,26 +101,19 @@
 
         </div>
         <div class="blog" id="targetCheapest">
+            <h2 style="padding: 10px;">DAILY RECIPE</h2>
             <div class="blog-post">
-                <img src="images/sample_image.png" alt="TBD">
-                <h3>RECIPE 1</h3>
-                <ul>
-                    <li>xxxkCAL</li>
-                    <li>Quick (5-10 minutes)</li>
-                    <li>Cheap (20PLN/PP)</li>
-                </ul>
-                <a href="#">CLICK TO GO TO RECIPE</a>
-            </div>
-            <h2 style="padding: 10px;">BLOG</h2>
-            <div class="blog-post">
-                <img src="images/sample_image.png" alt="TBD">
-                <h3>RECIPE 2</h3>
-                <ul>
-                    <li>xxxkCAL</li>
-                    <li>Quick (5-10 minutes)</li>
-                    <li>Cheap (20PLN/PP)</li>
-                </ul>
-                <a href="#">CLICK TO GO TO RECIPE</a>
+                <img src="images/steak.jpg" alt="steak">
+                <span>
+                    <h3>TBD RECIPE NAME</h3>
+                    <ul>
+                        <li>xxxkCAL</li>
+                        <li>Quick (5-10 minutes)</li>
+                        <li>Cheap (20PLN/PP)</li>
+                    </ul>
+                    <a href="" class="recipe-link" style="text-decoration: none; color: var(--clr-text-light);">SEE INGREDIENTS</a>
+                </span>
+
             </div>
         </div>
     </section>
@@ -154,7 +141,7 @@
                         <li>Quick (3 minutes)</li>
                         <li>Cheap (5PLN/PP)</li>
                     </ul>
-                    <a href="#" class="recipe-link" data-recipe="foobar">CLICK TO GO TO RECIPE</a>
+                    <a href="#" class="recipe-link" data-recipe="foobar">SEE INGREDIENTS</a>
                 </div>
             </div>
             <div class="recipe-card">
@@ -167,7 +154,7 @@
                         <li>Quick (3 minutes)</li>
                         <li>Cheap (5PLN/PP)</li>
                     </ul>
-                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">SEE INGREDIENTS</a>
                 </div>
             </div>
             <div class="recipe-card">
@@ -180,7 +167,7 @@
                         <li>Quick (3 minutes)</li>
                         <li>Cheap (5PLN/PP)</li>
                     </ul>
-                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">SEE INGREDIENTS</a>
                 </div>
             </div>
             <div class="recipe-card">
@@ -193,7 +180,7 @@
                         <li>Quick (3 minutes)</li>
                         <li>Cheap (5PLN/PP)</li>
                     </ul>
-                    <a href="#" class="recipe-link" data-recipe="pierogi">CLICK TO GO TO RECIPE</a>
+                    <a href="#" class="recipe-link" data-recipe="pierogi">SEE INGREDIENTS</a>
                 </div>
             </div>
         </div>
@@ -249,6 +236,24 @@
         </div>
     </section>
     <!-- ingredient handler with ajax hook to flask -->
+
+    <!-- #region CONTACT SCREEN  -->
+    <div class="contact-form">
+        <h2>Contact Us</h2>
+        <form action="mailto:your-email@example.com" method="post" enctype="text/plain">
+            <label for="author">Author</label>
+            <input type="text" id="author" name="author" placeholder="Your name..." required>
+
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" placeholder="Subject of your message..." required>
+
+            <label for="content">Content</label>
+            <textarea id="content" name="content" placeholder="Write your message..." required></textarea>
+
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+    <!-- #endregion -->
 </main>
 
 <footer>
