@@ -197,6 +197,11 @@
                 <button id="find-button">Find</button>
                 <button id="save-button" >Save recipe</button>
             </div>
+            <div class="maxDistance">
+                <p>Maximum distance :</p>
+                <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                <p><span id="demo"></span>km</p>
+            </div>
             <table class="input-table">
                 <thead>
                 <tr>
@@ -239,18 +244,13 @@
 
     <!-- #region CONTACT SCREEN  -->
     <div class="contact-form">
-        <h2>Contact Us</h2>
-        <form action="mailto:your-email@example.com" method="post" enctype="text/plain">
-            <label for="author">Author</label>
-            <input type="text" id="author" name="author" placeholder="Your name..." required>
+        <h1>Contact Us</h1>
+        <form action="send_email.php" method="POST" enctype="text/plain">
+            <label for="author"></label><input type="text" id="author" name="author" placeholder="Name" required>
+            <label for="title"></label><input type="text" id="title" name="title" placeholder="Subject" required>
+            <label for="content"></label><textarea id="content" name="content" placeholder="Write your message..." required></textarea>
 
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title" placeholder="Subject of your message..." required>
-
-            <label for="content">Content</label>
-            <textarea id="content" name="content" placeholder="Write your message..." required></textarea>
-
-            <button type="submit">Send Message</button>
+            <button type="submit" class="recipe-link">Send message</button>
         </form>
     </div>
     <!-- #endregion -->
