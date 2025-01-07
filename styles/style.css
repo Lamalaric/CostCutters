@@ -1,11 +1,7 @@
 /* POLICE */
 @font-face {
-    font-family: Montserrat regular;
-    src: url('../fonts/Montserrat/Montserrat-Regular.ttf');
-}
-@font-face {
-    font-family: Raleway regular;
-    src: url('../fonts/Raleway/static/Raleway-Regular.ttf');
+    font-family: Helvetica regular;
+    src: url('../fonts/Helvetica/HelveticaNowDisplay-Regular.ttf');
 }
 
 
@@ -27,7 +23,7 @@
     --clr-accent-2: #008ad4;
 
     width: 100%; height: 100%;
-    font-family: "Raleway regular", sans-serif;
+    font-family: "Helvetica regular", sans-serif;
     font-size: 18px;
     color: var(--clr-text-dark);
     scroll-behavior: smooth;
@@ -38,11 +34,13 @@ body {
     width: 100%; height: 100%;
     margin: 0;
 }
+section {
+    padding: 5px 0;
+}
 h1 {
     color: var(--clr-text-dark);
     font-size: 40px;
     text-align: center;
-    margin-top: 75px;
 }
 h2 {
     color: var(--clr-text-light);
@@ -156,12 +154,15 @@ nav {
     margin: 5px 0;
     font-size: 16px;
 }
-.my-recipes button {
+.my-recipes a {
+    font-weight: 500;
     transition-duration: .3s;
     display: block;
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     margin: 10px 0;
+    text-align: center;
+    text-decoration: none;
     border-radius: 5px;
     background-color: var(--clr-accent-1);
     color: #fff;
@@ -169,12 +170,36 @@ nav {
     cursor: pointer;
     font-size: 16px;
 }
-.my-recipes button:hover {
+.my-recipes a:hover {
     transition-duration: .3s;
     background-color: var(--clr-accent-2);
 }
 .my-recipes .recipes-btn {
     width: 100%;
+}
+/* Style du select */
+.dropdownRecipe {
+    background-color: white;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+/* Effet hover sur le select */
+.dropdownRecipe:hover {
+    border-color: #00AEEF;
+    box-shadow: 0 0 5px rgba(0, 174, 239, 0.5);
+}
+
+/* Effet focus sur le select */
+.dropdownRecipe:focus {
+    border-color: #007BB5;
+    box-shadow: 0 0 8px rgba(0, 123, 181, 0.8);
 }
 
 .blog-post {
@@ -211,12 +236,14 @@ nav {
 .input-table-container {
     display: flex;
     justify-content: space-between;
+    flex-direction: column;
     align-items: flex-start;
     gap: 20px;
     width: 100%;
 }
 .input-table {
-    width: 70%;
+    width: 80%;
+    margin: 0 auto;
     border-collapse: collapse;
 }
 .input-table th, .input-table td {
@@ -230,13 +257,15 @@ nav {
     box-sizing: border-box;
 }
 .btn-container {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     gap: 10px;
 }
 
-button#add-row-button, button#find-button {
+button#add-row-button, button#del-row-button, button#find-button {
     transition-duration: .3s;
     padding: 10px 20px;
     border-radius: 5px;
@@ -245,17 +274,17 @@ button#add-row-button, button#find-button {
     border: none;
     cursor: pointer;
 }
-button#add-row-button, button#find-button {
+button#add-row-button, button#del-row-button, button#find-button {
     width: 150px;
     height: 50px;
 }
-button#add-row-button:hover, button#find-button:hover {
+button#add-row-button:hover, button#del-row-button:hover, button#find-button:hover {
     transition-duration: .3s;
     background-color: var(--clr-accent-2);
 }
 
 
-button#add-row-button, button#save-button {
+button#add-row-button, button#del-row-button, button#save-button {
     transition-duration: .3s;
     padding: 10px 20px;
     border-radius: 5px;
@@ -264,11 +293,11 @@ button#add-row-button, button#save-button {
     border: none;
     cursor: pointer;
 }
-button#add-row-button, button#save-button {
+button#add-row-button, button#del-row-button, button#save-button {
     width: 150px;
     height: 50px;
 }
-button#add-row-button:hover, button#save-button:hover {
+button#add-row-button:hover, button#del-row-button:hover, button#save-button:hover {
     transition-duration: .3s;
     background-color: var(--clr-accent-2);
 }
@@ -289,6 +318,20 @@ button#add-row-button:hover, button#save-button:hover {
 
 
 /* RECIPES */
+.recipe-container {
+    background-color: var(--clr-header);
+}
+.recipe-container .recipe-load {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 100px;
+}
+.recipe-container .recipe-load label {
+    color: var(--clr-text-dark);
+}
+
 .recipe-container .recipe-cards {
     display: flex;
     flex-wrap: wrap;

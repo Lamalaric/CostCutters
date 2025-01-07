@@ -85,8 +85,7 @@
             <ul class="nav-links" id="nav-links">
                 <li><a href="#">Home</a></li>
                 <li><a href="#targetCheapest">Find ingredients</a></li>
-                <li><a href="#">Recipes</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="#recipe">Recipes</a></li>
             </ul>
         </nav>
     </div>
@@ -105,13 +104,12 @@
                 <li>'Strawberry jam' - 10PLN</li>
             </ul>
             <div class="recipes-btn">
-                <button>CREATE A RECIPE</button>
-                <button>SAVED RECIPES</button>
-                <button>IMPORT RECIPE</button>
+                <a href="#find">CREATE A RECIPE</a>
+                <a href="#load">LOAD A SAVED RECIPE</a>
             </div>
 
         </div>
-        <div class="blog">
+        <div class="blog" id="targetCheapest">
             <div class="blog-post">
                 <img src="images/sample_image.png" alt="TBD">
                 <h3>RECIPE 1</h3>
@@ -126,7 +124,7 @@
             <div class="blog-post">
                 <img src="images/sample_image.png" alt="TBD">
                 <h3>RECIPE 2</h3>
-                <ul id="targetCheapest">
+                <ul>
                     <li>xxxkCAL</li>
                     <li>Quick (5-10 minutes)</li>
                     <li>Cheap (20PLN/PP)</li>
@@ -137,60 +135,17 @@
     </section>
     <!-- #endregion -->
 
-    <!-- SECOND SCREEN -->
-    <section class="find-cheapest" >
-        <h1>Find the cheapest ingredients</h1>
-        <div class="input-table-container">
-            <table class="input-table">
-                <thead>
-                    <tr>
-                        <th>Store (Optional)</th>
-                        <th>Ingredient</th>
-                        <th>Quantity</th>
-                    </tr>
-                </thead>
-                <tbody id="ingredient-rows">
-                    <tr>
-                        <td><input type="text" placeholder="Store"></td>
-                        <td><input type="text" placeholder="Ingredient"></td>
-                        <td><input type="number" placeholder="Quantity"></td>
-                    </tr>
-              
-                </tbody>
-            </table>
-            <div class="btn-container">
-                <button id="add-row-button">+</button>
-                <button id="find-button">Find</button>
-                <button id="save-button" >Save recipe</button>
-
-                
-            </div>
-        </div>
-    
-        <!-- Results Table -->
-        <div id="results-container">
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th>Ingredient</th>
-                        <th>Quantity</th>
-                        <th>Cost/Item</th>
-                        <th>Total Cost</th>
-                        <th>Store</th>
-                        <th>Travel Time</th>
-                    </tr>
-                </thead>
-                <tbody id="results-body">
-                    <!-- Dynamic rows will be added here -->
-                </tbody>
-            </table>
-        </div>
-    </section> 
-    <!-- ingredient handler with ajax hook to flask -->
-
-    <!-- #region THIRD SCREEN  -->
+    <!-- #region SECOND SCREEN  -->
     <section class="recipe-container">
         <h1>Recipes</h1>
+        <div class="recipe-load" id="load">
+            <label for="recipes">LOAD A SAVED RECIPE :</label>
+            <select id="recipes" class="dropdownRecipe">
+                <option> -- Select a recipe -- </option>
+                <option>NAME - USER - 69PLN</option>
+            </select>
+        </div>
+        <p style="color: var(--clr-text-dark); text-align: center; font-size: 2em; padding: 10px 0;">OR</p>
         <div class="recipe-cards">
             <div class="recipe-card">
                 <img src="images/sample_image.png" alt="TBD">
@@ -245,56 +200,58 @@
                 </div>
             </div>
         </div>
-        <!-- #endregion -->
+    </section>
+    <!-- #endregion -->
 
-        <!-- RECIPIE SCREEN -->
-        <div id="recipe-details" class="recipe-details-block">
-            <div class="recipe-table-container">
-                <h2>Recipe - {UserRecipe} BY {UserName}</h2>
-                <table class="ingredients-table">
-                    <thead>
-                    <tr>
-                        <th>Ingredient</th>
-                        <th>Quantity</th>
-                        <th>Cost/Item</th>
-                        <th>Total Cost</th>
-                        <th>Store</th>
-                        <th>Travel Time</th>
-                    </tr>
-                    </thead>
-                    <tbody id="ingredients-list">
-                        <!-- Dynamically filled with ingredients -->
-                    <tr>
-                        <td>Flour</td>
-                        <td>500g</td>
-                        <td>2 PLN</td>
-                        <td>4 PLN</td>
-                        <td>Zabka</td>
-                        <td>10 min</td>
-                    </tr>
-                    <tr>
-                        <td>Water</td>
-                        <td>1L</td>
-                        <td>1 PLN</td>
-                        <td>1 PLN</td>
-                        <td>Biedronka</td>
-                        <td>5 min</td>
-                    </tr>
-                    </tbody>
-                </table>
+    <!-- THIRD SCREEN -->
+    <section class="find-cheapest" id="find">
+        <h1>Find the cheapest ingredients</h1>
+        <div class="input-table-container">
+            <div class="btn-container">
+                <button id="add-row-button">+</button>
+                <button id="del-row-button">-</button>
+                <button id="find-button">Find</button>
+                <button id="save-button" >Save recipe</button>
             </div>
-            <div class="total-cost-container">
-                <div class="total-cost-block">
-                    <h2>Total Meal Cost</h2>
-                    <p class="total-cost">500 PLN</p>
-                    <div class="actions">
-                        <button id="save-recipe">Save</button>
-                        <button id="export-recipe">Export</button>
-                    </div>
-                </div>
-            </div>
+            <table class="input-table">
+                <thead>
+                <tr>
+                    <th>Store (Optional)</th>
+                    <th>Ingredient</th>
+                    <th>Quantity</th>
+                </tr>
+                </thead>
+                <tbody id="ingredient-rows">
+                <tr>
+                    <td><input type="text" placeholder="Store"></td>
+                    <td><input type="text" placeholder="Ingredient"></td>
+                    <td><input type="number" placeholder="Quantity"></td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Results Table -->
+        <div id="results-container">
+            <table class="results-table">
+                <thead>
+                <tr>
+                    <th>Ingredient</th>
+                    <th>Quantity</th>
+                    <th>Cost/Item</th>
+                    <th>Total Cost</th>
+                    <th>Store</th>
+                    <th>Travel Time</th>
+                </tr>
+                </thead>
+                <tbody id="results-body">
+                <!-- Dynamic rows will be added here -->
+                </tbody>
+            </table>
         </div>
     </section>
+    <!-- ingredient handler with ajax hook to flask -->
 </main>
 
 <footer>
@@ -304,7 +261,6 @@
         </div>
         <div class="footer-links">
             <ul>
-                <li><a href="#">Privacy Policy</a></li>
                 <li><a href="#">Terms of Service</a></li>
                 <li><a href="#">Contact Us</a></li>
                 <li><a href="#">About Us</a></li>
