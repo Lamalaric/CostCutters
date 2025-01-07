@@ -27,6 +27,25 @@ document.addEventListener('DOMContentLoaded', function () {
 	const navLinks = document.getElementById('nav-links');
 
 
+	//Mouse tracker
+	document.addEventListener("mousemove", function (event) {
+		const mouseData = {
+			x: event.pageX,
+			y: event.pageY,
+			timestamp: new Date().toISOString()
+		};
+
+		// Send data to the Flask backend
+		fetch("http://localhost:5000/mouse-data", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(mouseData)
+		}).catch(console.error);
+	});
+
+
 	//#region BURGER MENU
 	if (menuIcon && navLinks) {
 		menuIcon.addEventListener('click', function () {

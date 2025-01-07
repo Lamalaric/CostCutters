@@ -293,6 +293,22 @@ def get_all_recipes():
             return jsonify({"message": "No recipes found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/mouse-data', methods=['POST'])
+def save_mouse_data():
+    try:
+        # Get the mouse data from the request
+        data = request.json
+
+        # Save the data to a file (or database)
+        with open("mouse_data.json", "a") as file:
+            file.write(json.dumps(data) + "\n")
+
+        return jsonify({"message": "Mouse data saved!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 #endregion
 #region -------- Run Program --------
 if __name__ == "__main__":
