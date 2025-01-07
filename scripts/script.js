@@ -13,6 +13,10 @@ window.onload = () => {
 		let barre = position / hauteur * largeur
 		// Modification du CSS de la barre
 		document.getElementById("progress").style.width = barre+"px"
+
+
+        // PLEASE FIX LATER
+        sendPositionToPython(navigator.geolocation.getCurrentPosition(showPosition));
 	})
 }
 //#endregion
@@ -324,6 +328,7 @@ document.getElementById("find-button").addEventListener("click", (event) => {
 async function sendPositionToPython(position) {
 
   alert("Please enable location for distance calculation");
+  // remove line below later
   navigator.geolocation.getCurrentPosition(showPosition);
   const data = await response.json();
   ingredients.push({ store, ingredient, quantity });
@@ -347,6 +352,42 @@ async function sendPositionToPython(position) {
     })
     .then(response => response.json())  // Parse the JSON response
     .then(dataGeo => console.log(dataGeo));   // Remove on final version we don't need user location on client side 
+}
+//#endregion
+
+
+
+//#region Populate lists RCP
+async function populateRecipies() {
+    // Get the dropdown element by its ID
+    var dropdown = document.getElementById("recipes");
+
+    // testing and dev
+    const apiUrl = 'http://127.0.0.1:5000/get-all-recipes';
+
+    // Fetch all recipes from the API
+        // Send GET request to the /get-all-recipes route
+    fetch(apiUrl)
+    .then(response => response.json()) // Parse the response as JSON
+    .then(data => {
+        // Loop through each recipe and print it to the console
+        data.recipes.forEach(recipe => {
+
+            // remove console.log after testing
+            console.log(`Recipe Name: ${recipe.recipe_name}, Total Cost: $${recipe.total_cost}`);
+
+            // Create a new option element
+            var newOption = document.createElement("option");
+
+            // Set the value and text of the new option
+            newOption.value = "RECIPE" + recipe.recipe_name;
+            // Recipe name - Price in PLN from flask hook
+            newOption.textContent = "PLN" + recipe.total_cost;
+
+            // Append the new option to the dropdown
+            dropdown.appendChild(newOption);
+        });
+    });
 }
 //#endregion
 
