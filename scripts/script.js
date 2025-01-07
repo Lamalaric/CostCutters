@@ -315,4 +315,39 @@ document.getElementById("find-button").addEventListener("click", (event) => {
     submitForm();  // Trigger the form submission process
 //#endregion
 });
+
+
+
+
+//#region GeoLocation 
+// call on start of page load with an alert 
+async function sendPositionToPython(position) {
+
+  alert("Please enable location for distance calculation");
+  navigator.geolocation.getCurrentPosition(showPosition);
+  const data = await response.json();
+  ingredients.push({ store, ingredient, quantity });
+
+
+  // Not yet implemented or tested 
+  const url = 'http://127.0.0.1:5000/DistanceCalculation';
+    const dataGeo = 
+    {
+    y: position.coords.latitude, // first var latitude 
+    x: position.coords.longitude // second var longitude 
+    };
+
+    // push the data to the FLASK server 
+    fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataGeo)
+    })
+    .then(response => response.json())  // Parse the JSON response
+    .then(dataGeo => console.log(dataGeo));   // Remove on final version we don't need user location on client side 
+}
+//#endregion
+
 });
