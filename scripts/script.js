@@ -28,26 +28,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // quick functions call
     populateRecipies();
-    //sendPositionToPython(navigator.geolocation.getCurrentPosition(showPosition));
+    
+    
 
+    //#region Slider
 
-	//Mouse tracker
-	document.addEventListener("mousemove", function (event) {
-		const mouseData = {
-			x: event.pageX,
-			y: event.pageY,
-			timestamp: new Date().toISOString()
-		};
+    //Slider distance filter
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("demo");
 
-		// Send data to the Flask backend
-		fetch("http://localhost:5000/mouse-data", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(mouseData)
-		}).catch(console.error);
-	});
+    output.innerHTML = slider.value;
+
+    slider.oninput = function() {
+        output.innerHTML = this.value;
+    }
+    //#endregion
+
+    // Call getInitialPosition to get the user's location once
+    getInitialPosition();
+
+  
+
 
 
 	//#region BURGER MENU
@@ -66,46 +67,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    //#region Row editing
+    //#region Row editing listener
 	//Add a row in the find recipe table
 	// Add event listener to the "add-row-button" button
 	document.getElementById("add-row-button").addEventListener("click", function() {
-		const ingredientRows = document.getElementById("ingredient-rows");
-		
-		// Create a new row with the same structure as the previous rows
-		const newRow = document.createElement("tr");
-
-		const storeCell = document.createElement("td");
-		storeCell.innerHTML = '<input type="text" placeholder="Store">';
-		
-		const ingredientCell = document.createElement("td");
-		ingredientCell.innerHTML = '<input type="text" placeholder="Ingredient">';
-		
-		const quantityCell = document.createElement("td");
-		quantityCell.innerHTML = '<input type="number" placeholder="Quantity">';
-		
-		newRow.appendChild(storeCell);
-		newRow.appendChild(ingredientCell);
-		newRow.appendChild(quantityCell);
-		
-		// Append the new row to the table body
-		ingredientRows.appendChild(newRow);
+        // add the number of rows required 
+        addRows(1);
 	});
 
-
     document.getElementById("del-row-button").addEventListener("click", function() {
-        const ingredientRows = document.getElementById("ingredient-rows");
-    
-        // Check if there are any rows to delete
-        if (ingredientRows.lastChild) {
-            ingredientRows.removeChild(ingredientRows.lastChild);
-        } else {
-            alert("przestań... masz problem? >:(");
-        }
+        deleteLastRow();
     });
-
-
-
 
     //#endregion
 
@@ -118,61 +90,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-	//Show the table of details of a recipe
-	document.querySelectorAll('.recipe-link').forEach(link => {
-		link.addEventListener('click', function (event) {
-			event.preventDefault(); // Empêche la navigation vers une autre page
-
-			// Obtenir le nom de la recette pour laquelle les détails doivent être affichés
-			const recipeName = this.getAttribute('data-recipe');
-
-			// Logique pour récupérer les informations spécifiques à la recette (ici des données statiques pour l'exemple)
-			const recipes = {
-				pierogi: {
-					ingredients: [
-						{ name: 'Flour', quantity: '500g', cost: '2 PLN', totalCost: '4 PLN', store: 'Zabka', travelTime: '10 min' },
-						{ name: 'Water', quantity: '1L', cost: '1 PLN', totalCost: '1 PLN', store: 'Biedronka', travelTime: '5 min' }
-					],
-					totalCost: '500 PLN'
-				},
-				foobar: {
-					ingredients: [
-						{ name: 'FOOOO', quantity: '500g', cost: '2 PLN', totalCost: '4 PLN', store: 'Zabka', travelTime: '10 min' },
-						{ name: 'BAAAR', quantity: '1L', cost: '1 PLN', totalCost: '1 PLN', store: 'Biedronka', travelTime: '5 min' }
-					],
-					totalCost: '500 PLN'
-				}
-			};
-
-			// Obtenir les détails de la recette choisie
-			const recipe = recipes[recipeName];
-			if (!recipe) return;
-
-			// Mettre à jour le tableau des ingrédients avec les détails de la recette
-			const ingredientsList = document.getElementById('ingredients-list');
-			ingredientsList.innerHTML = ''; // Vider les lignes existantes
-
-			recipe.ingredients.forEach(ingredient => {
-				const row = document.createElement('tr');
-				row.innerHTML = `
-                <td>${ingredient.name}</td>
-                <td>${ingredient.quantity}</td>
-                <td>${ingredient.cost}</td>
-                <td>${ingredient.totalCost}</td>
-                <td>${ingredient.store}</td>
-                <td>${ingredient.travelTime}</td>`
-            ;
-				ingredientsList.appendChild(row);
-			});
-
-			// Afficher le coût total
-			const totalCostElement = document.querySelector('.total-cost');
-			totalCostElement.textContent = recipe.totalCost;
-
-			// Afficher le bloc des détails de la recette
-			document.getElementById('recipe-details').classList.remove('hidden');
-		});
-	});
 
 
 
@@ -407,16 +324,89 @@ async function sendPositionToPython(position) {
 }
 //#endregion
 
+//#region Row Editing
 async function addRows(rows)
 {
     console.log(rows);
     for (let i = 0; i != rows; i++) {
-        console.log(i); // Prints numbers 0 through 9
+        console.log("row created"); // Prints numbers 0 through 9
+
+        const ingredientRows = document.getElementById("ingredient-rows");
+		
+		// Create a new row with the same structure as the previous rows
+		const newRow = document.createElement("tr");
+
+		const storeCell = document.createElement("td");
+		storeCell.innerHTML = '<input type="text" placeholder="Store">';
+		
+		const ingredientCell = document.createElement("td");
+		ingredientCell.innerHTML = '<input type="text" placeholder="Ingredient">';
+		
+		const quantityCell = document.createElement("td");
+		quantityCell.innerHTML = '<input type="number" placeholder="Quantity">';
+		
+		newRow.appendChild(storeCell);
+		newRow.appendChild(ingredientCell);
+		newRow.appendChild(quantityCell);
+		
+		// Append the new row to the table body
+		ingredientRows.appendChild(newRow);
     }
 
 };
 
+async function deleteLastRow()
+{
+    const ingredientRows = document.getElementById("ingredient-rows");
+    
+        // Check if there are any rows to delete
+        if (ingredientRows.lastChild) {
+            ingredientRows.removeChild(ingredientRows.lastChild);
+        } else {}
+};
 
+
+async function adminRow(rowsToAdd, ingredient, quantity) 
+// pre filled rows being added, lush init, call delete row before running
+{
+    console.log(rowsToAdd);
+    for (let i = 0; i != rowsToAdd; i++) {
+        console.log("row created"); // Prints numbers 0 through 9
+
+        const ingredientRows = document.getElementById("ingredient-rows");
+		
+		// Create a new row with the same structure as the previous rows
+		const newRow = document.createElement("tr");
+
+		const storeCell = document.createElement("td");
+		storeCell.innerHTML = '<input type="text" placeholder="Store">';
+		
+		const ingredientCell = document.createElement("td");
+        const ingredientInput = document.createElement("input");
+        ingredientInput.type = "text";
+        ingredientInput.placeholder = ingredient;
+        ingredientInput.value = ingredient;  // Static value for ingredient (e.g., Ingredient1, Ingredient2)
+        ingredientCell.appendChild(ingredientInput);
+
+        const quantityCell = document.createElement("td");
+        const quantityInput = document.createElement("input");
+        quantityInput.type = "number";
+        quantityInput.placeholder = quantity;
+        quantityInput.value = quantity;  // Static value for quantity (e.g., 2, 4, 6, ...)
+        quantityCell.appendChild(quantityInput);
+
+		
+		newRow.appendChild(storeCell);
+		newRow.appendChild(ingredientCell);
+		newRow.appendChild(quantityCell);
+		
+		// Append the new row to the table body
+		ingredientRows.appendChild(newRow);
+    }
+
+};
+
+//#endregion
 //#region Populate lists RCP
 async function populateRecipies() {
     // Get the dropdown element by its ID
@@ -441,28 +431,207 @@ async function populateRecipies() {
 
             // Set the value and text of the new option
             newOption.value = "RECIPE" + recipe.recipe_name;
+            newOption.ATTRIBUTE_NODE
             // Recipe name - Price in PLN from flask hook
-            newOption.textContent = recipe.recipe_name + " //  PLN " + recipe.total_cost;
+            newOption.textContent = recipe.recipe_name + " //  PLN " + recipe.total_cost + " by " + recipe.username;
+            
 
+            // store hidden attributes to access on selecting recipe 
+            newOption.setAttribute("data-recipe-name", recipe.recipe_name);
+            newOption.setAttribute("data-total-cost", recipe.total_cost);
+            newOption.setAttribute("data-username", recipe.username);
             // Append the new option to the dropdown
             dropdown.appendChild(newOption);
         });
-        return;
+          // Add event listener for when the user selects an option
+          dropdown.addEventListener("change", function(event) {
+
+            // Get the selected option
+            const selectedOption = event.target.options[event.target.selectedIndex];
+
+            // Skip if the default option is selected
+            if (selectedOption.textContent === "-- Select a recipe --") {
+                return;
+            }
+
+            // Access the hidden data attributes
+            const recipeName = selectedOption.getAttribute("data-recipe-name");
+            const totalCost = selectedOption.getAttribute("data-total-cost");
+            const username = selectedOption.getAttribute("data-username");
+            console.log("new recipe selected");
+            // Call a function when an option is selected
+            // add function to populate recipe table 
+            getRecipe(username, recipeName);
+        });
     });
 }
+
+
+
+
+async function getRecipe(username, recipeName) {
+    const apiUrl = 'http://127.0.0.1:5000/retrieve-recipe';
+    
+    // Data to send in the request body
+    const requestData = {
+        username: username,
+        recipe_name: recipeName,
+        distance: slider.value
+    };
+    
+    // Make the POST request with the request body
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    });
+
+    // Parse the JSON response and return the recipe
+    const data = await response.json();
+
+
+    // try to delete 50 rows back because efficiency 
+    for (let i = 0; i < 50; i++) {
+        await deleteLastRow(); 
+    }
+    
+    
+    if (data.recipe && data.recipe.items) {
+        // Iterating over the items
+        data.recipe.items.forEach(item => {
+            console.log("Item:", item.ingredient); // Display item name
+            console.log("Quantity:", item.quantity); // Display quantity
+            console.log("distance km" + slider.value)
+            adminRow(1, item.ingredient, item.quantity)
+        });
+    }
+
+    return data.recipe; // Return the recipe data
+};
 //#endregion
 
 
 
-//#region Slider
+let userLocation = null; // Initialize a variable to store the user's location
 
-//Slider distance filter
-var slider = document.getElementById("myRange");
-var output = document.getElementById("demo");
-output.innerHTML = slider.value;
+// Function to get the user's position only once
+function getInitialPosition() {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        // Store the user's location after the first call
+        userLocation = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+            maxDistance: 50
+        };
 
-slider.oninput = function() {
-    output.innerHTML = this.value;
+        console.log("Initial user location:", userLocation);
+
+        // Send the initial location to the Flask server
+        fetch('http://127.0.0.1:5000/set-user-location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userLocation)
+        });
+    });
 }
-//#endregion
+
+// Function to repeatedly send the stored user location to the server every 500ms
+function updatelocation(slideval) {
+    if (userLocation) {
+        // Update the maxDistance value with the current slider value each time
+        userLocation.maxDistance = slideval;
+
+        // Send the updated location data to the Flask server
+        fetch('http://127.0.0.1:5000/set-user-location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userLocation)
+        });
+    }
+}
+
+// Define the function that will be called on slider change
+function onSliderChange() {
+    // Update the displayed value in the span
+    output.innerHTML = slider.value;
+
+    // Log the value for testing
+    console.log("Slider value:", slider.value);
+    updatelocation(slider.value)
+
+}
+
+// Set up the event listener for the 'input' event to call the onSliderChange function
+slider.addEventListener('input', onSliderChange);
+
+
+document.querySelector(".submitbut").addEventListener("click", function() {
+    console.log("Submitted");
+
+    const data = {
+        variable1: document.querySelector("#author").innerHTML,
+        variable2: document.querySelector("#title").innerHTML,
+        variable3: document.querySelector("#content").innerHTML
+    };
+
+    fetch('http://127.0.0.1:5000/create-user-report', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
 });
+
+//#region RecipeLiseners
+
+// Select the element with the class "recipe-link recipe5"
+
+const recipeLink1 = document.querySelector(".recipe-link.recipe1")
+const recipeLink2 = document.querySelector(".recipe-link.recipe2");
+const recipeLink3 = document.querySelector(".recipe-link.recipe3");
+const recipeLink4 = document.querySelector(".recipe-link.recipe4");
+const recipeLink5 = document.querySelector(".recipe-link.recipe5");
+recipeLink1.addEventListener("click", function(event) {
+    // preventing the link from navigating
+
+    getRecipe("admin", "pierogi")
+});
+recipeLink2.addEventListener("click", function(event) {
+    // preventing the link from navigating
+    event.preventDefault();
+    getRecipe("admin", "pierogi")
+});
+recipeLink3.addEventListener("click", function(event) {
+    // preventing the link from navigating
+    event.preventDefault();
+    getRecipe("admin", "pierogi")
+});
+recipeLink4.addEventListener("click", function(event) {
+    // preventing the link from navigating
+    event.preventDefault();
+    getRecipe("admin", "pierogi")
+});
+recipeLink5.addEventListener("click", function(event) {
+    // preventing the link from navigating
+    event.preventDefault();
+    getRecipe("admin", "pierogi")
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+});
+
+

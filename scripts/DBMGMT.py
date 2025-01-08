@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
 import json
+import math
 #region Initialize Flask application
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -13,6 +14,40 @@ class Database:
     def __init__(self):
         """Initialization function and initial connection to the database."""
         self.db_name = "PriceList.db"
+        self.MaxDistance = 0
+        self.userLat = 0
+        self.userLon = 0
+    
+    def set_location(self, lat, lon, maxDistance):
+        """Set users location for distance calc which isn't needed as the stores are local"""
+        self.userLat = lat
+        self.userLon = lon
+        self.MaxDistance = maxDistance
+        print("users location has been set")
+        print(self.userLat)
+        print(self.userLon)
+        print("max distance")
+        print(self.MaxDistance)
+
+    def get_distance(self, lat1, lon1):
+        """Returns the distance between lat lon in db and users loc"""
+        R = 6371.0  # Radius of the Earth in km
+        
+        # Convert deg to rad
+        lat1_rad, lon1_rad = math.radians(lat1), math.radians(lon1)
+        lat2_rad, lon2_rad = math.radians(self.userLat), math.radians(self.userLon)
+        
+        # Haversine formula
+        dlat = lat2_rad - lat1_rad
+        dlon = lon2_rad - lon1_rad
+        a = math.sin(dlat / 2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        
+        # Return distance as int
+        print(int(R * c))
+        return int(R * c)  # Distance in kilometers in int
+
+        
 
     def execute_query(self, query, params=None, fetch=False):
         """Utility to execute a query with or without parameters."""
@@ -38,9 +73,9 @@ class Database:
     
     def get_all_recipes(self):
         """Retrieve all recipes with name and total cost."""
-        query = "SELECT recipe_name, total_price FROM UserRecipes"
+        query = "SELECT recipe_name, total_price, username FROM UserRecipes"
         rows = self.execute_query(query, fetch=True)
-        return [{"recipe_name": row["recipe_name"], "total_cost": row["total_price"]} for row in rows]
+        return [{"recipe_name": row["recipe_name"], "total_cost": row["total_price"], "username": row["username"]} for row in rows]
 
     def create_blank(self):
         """Create and populate the 'prices' table."""
@@ -102,7 +137,7 @@ class Database:
 
         self.execute_query(execute_query, (username, recipe_name, items, total_price), fetch=False)
 
-    def retrieve_recipe(self, username, recipe_name):
+    def retrieve_recipe(self, username, recipe_name): # add distance filter
         """Retrieves a recipe based on username and recipe name."""
         query = '''
         SELECT * FROM UserRecipes 
@@ -112,10 +147,14 @@ class Database:
 
         if result:
             recipe = result[0]  # If found, return the first result (since it's unique)
+
+            # Deserialize the 'items' field if it's a JSON string
+            items = json.loads(recipe["items"]) if isinstance(recipe["items"], str) else recipe["items"]
+
             return {
                 "username": recipe["username"],
                 "recipe_name": recipe["recipe_name"],
-                "items": recipe["items"],
+                "items": items,  # Make sure items is a list
                 "total_price": recipe["total_price"]
             }
         else:
@@ -130,7 +169,7 @@ class Database:
         
         # Find the item with the lowest price
         cheapest_item = min(items_in_store, key=lambda x: x['price'])
-
+        print(self.get_distance(cheapest_item["lat"], cheapest_item["lon"]))
         return {
             "store": cheapest_item["store"],
             "ingredient": cheapest_item["ingredient"],
@@ -189,7 +228,7 @@ def find_cheapest():
                 'costPerItem': cheapest_item['price'],
                 'totalCost': total_cost,
                 'store': cheapest_item['store'],
-                'travelTime': "10 min"  # Default travel time (this could be dynamically calculated based on lat/lon)
+                'travelTime': db.get_distance(cheapest_item['lat'],cheapest_item['lon'])
             })
         else:
             # If no item found, append a result indicating the item is unavailable
@@ -260,15 +299,17 @@ def add_recipe():
         return jsonify({"error": str(e)}), 500
 
 # retrieve a recipe
-@app.route('/retrieve-recipe', methods=['GET'])
+@app.route('/retrieve-recipe', methods=['POST'])
 def retrieve_recipe():
     try:
-        # Extract query parameters
-        username = request.args.get("username")
-        recipe_name = request.args.get("recipe_name")
+        # Extract the JSON data from the request body
+        data = request.json
+        username = data.get("username")
+        recipe_name = data.get("recipe_name")
+        #distance = data.get("distance")
 
         if not username or not recipe_name:
-            return jsonify({"error": "Missing required query parameters: username or recipe_name"}), 400
+            return jsonify({"error": "Missing required fields: username or recipe_name"}), 400
         
         # Retrieve the recipe from the database
         recipe = db.retrieve_recipe(username, recipe_name)
@@ -309,6 +350,49 @@ def save_mouse_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+
+@app.route('/set-user-location', methods=['POST'])
+def set_user_location():
+    try:
+        # Get the location data from the request JSON
+        data = request.json
+        user_lat = data.get('lat')
+        user_lon = data.get('lon')
+        maxDistance = data.get('maxDistance')
+
+        if user_lat is None or user_lon is None:
+            return jsonify({"error": "Missing latitude or longitude"}), 400
+
+        # Set the user's location using the Database class
+        db.set_location(user_lat, user_lon, maxDistance)
+
+        return jsonify({"message": "User location, max distance set successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/create-user-report', methods=['POST'])
+def create_user_report():
+    try:
+        data = request.json  # Get JSON data from the request
+        
+        # Extract variables from the JSON body
+        variable1 = data.get('variable1')
+        variable2 = data.get('variable2')
+        variable3 = data.get('variable3')
+
+        # Create the content for the file
+        report_content = f"Variable 1: {variable1}\nVariable 2: {variable2}\nVariable 3: {variable3}\n"
+
+        # Write content to a file on the server
+        with open('userreports.txt', 'w') as file:
+            file.write(report_content)
+
+        return jsonify({"message": "File created successfully!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 #endregion
 #region -------- Run Program --------
 if __name__ == "__main__":
