@@ -111,7 +111,7 @@
                         <li>Quick (5-10 minutes)</li>
                         <li>Cheap (20PLN/PP)</li>
                     </ul>
-                    <a href="" class="recipe-link" style="text-decoration: none; color: var(--clr-text-light);">SEE INGREDIENTS</a>
+                    <a href="" class="recipe-link recipe1" style="text-decoration: none; color: var(--clr-text-light);">SEE INGREDIENTS</a>
                 </span>
 
             </div>
@@ -126,7 +126,6 @@
             <label for="recipes">LOAD A SAVED RECIPE :</label>
             <select id="recipes" class="dropdownRecipe">
                 <option> -- Select a recipe -- </option>
-                <option>NAME - USER - 69PLN</option>
             </select>
         </div>
         <p style="color: var(--clr-text-dark); text-align: center; font-size: 2em; padding: 10px 0;">OR</p>
@@ -141,7 +140,7 @@
                         <li>Quick (3 minutes)</li>
                         <li>Cheap (5PLN/PP)</li>
                     </ul>
-                    <a href="#" class="recipe-link" data-recipe="foobar">SEE INGREDIENTS</a>
+                    <a href="#" class="recipe-link recipe2" data-recipe="foobar">SEE INGREDIENTS</a>
                 </div>
             </div>
             <div class="recipe-card">
@@ -154,7 +153,7 @@
                         <li>Quick (3 minutes)</li>
                         <li>Cheap (5PLN/PP)</li>
                     </ul>
-                    <a href="#" class="recipe-link" data-recipe="pierogi">SEE INGREDIENTS</a>
+                    <a href="#" class="recipe-link recipe3" data-recipe="pierogi">SEE INGREDIENTS</a>
                 </div>
             </div>
             <div class="recipe-card">
@@ -167,7 +166,7 @@
                         <li>Quick (3 minutes)</li>
                         <li>Cheap (5PLN/PP)</li>
                     </ul>
-                    <a href="#" class="recipe-link" data-recipe="pierogi">SEE INGREDIENTS</a>
+                    <a href="#" class="recipe-link recipe4" data-recipe="pierogi">SEE INGREDIENTS</a>
                 </div>
             </div>
             <div class="recipe-card">
@@ -180,7 +179,7 @@
                         <li>Quick (3 minutes)</li>
                         <li>Cheap (5PLN/PP)</li>
                     </ul>
-                    <a href="#" class="recipe-link" data-recipe="pierogi">SEE INGREDIENTS</a>
+                    <a href="#" class="recipe-link recipe5" data-recipe="pierogi">SEE INGREDIENTS</a>
                 </div>
             </div>
         </div>
@@ -199,7 +198,7 @@
             </div>
             <div class="maxDistance">
                 <p>Maximum distance :</p>
-                <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                <input type="range" min="20" max="100" value="50" class="slider" id="myRange">
                 <p><span id="demo"></span>km</p>
             </div>
             <table class="input-table">
@@ -250,10 +249,26 @@
             <label for="title"></label><input type="text" id="title" name="title" placeholder="Subject" required>
             <label for="content"></label><textarea id="content" name="content" placeholder="Write your message..." required></textarea>
 
-            <button type="submit" class="recipe-link">Send message</button>
+            <button type="submit" class="recipe-link submitbut">Send message</button>
         </form>
     </div>
-    <!-- #endregion -->
+    <!-- #endregion -->document.querySelector(".submitbut").addEventListener("click", function() {
+    console.log("Submitted");
+
+    const data = {
+        variable1: document.querySelector("#author").innerHTML,
+        variable2: document.querySelector("#title").innerHTML,
+        variable3: document.querySelector("#content").innerHTML
+    };
+
+    fetch('http://127.0.0.1:5000/create-user-report', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+});
 </main>
 
 <footer>
