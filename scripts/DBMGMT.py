@@ -3,9 +3,11 @@ from flask_cors import CORS
 import sqlite3
 import json
 import math
+import logging
 #region Initialize Flask application
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s %(levelname)s %(message)s')
 # Database class
 #endregion
 
@@ -333,7 +335,8 @@ def get_all_recipes():
         else:
             return jsonify({"message": "No recipes found"}), 404
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logging.error("Error in get_all_recipes: %s", str(e))
+        return jsonify({"error": "An internal error has occurred!"}), 500
 
 
 @app.route('/mouse-data', methods=['POST'])
@@ -348,7 +351,8 @@ def save_mouse_data():
 
         return jsonify({"message": "Mouse data saved!"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logging.error("Error in save_mouse_data: %s", str(e))
+        return jsonify({"error": "An internal error has occurred!"}), 500
 
 
 
@@ -370,7 +374,8 @@ def set_user_location():
         return jsonify({"message": "User location, max distance set successfully"}), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logging.error("Error in set_user_location: %s", str(e))
+        return jsonify({"error": "An internal error has occurred!"}), 500
     
 @app.route('/create-user-report', methods=['POST'])
 def create_user_report():
@@ -391,7 +396,8 @@ def create_user_report():
 
         return jsonify({"message": "File created successfully!"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logging.error("Error in create_user_report: %s", str(e))
+        return jsonify({"error": "An internal error has occurred!"}), 500
     
 #endregion
 #region -------- Run Program --------
