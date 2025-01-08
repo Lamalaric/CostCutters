@@ -16,7 +16,7 @@ window.onload = () => {
 
 
         // PLEASE FIX LATER
-        sendPositionToPython(navigator.geolocation.getCurrentPosition(showPosition));
+        
 	})
 }
 //#endregion
@@ -25,6 +25,10 @@ window.onload = () => {
 document.addEventListener('DOMContentLoaded', function () {
 	const menuIcon = document.getElementById('menu-icon');
 	const navLinks = document.getElementById('nav-links');
+
+    // quick functions call
+    populateRecipies();
+    //sendPositionToPython(navigator.geolocation.getCurrentPosition(showPosition));
 
 
 	//Mouse tracker
@@ -59,6 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		const resultsContainer = document.getElementById('results-container');
 		resultsContainer.classList.remove('hidden'); // Show the results table
 	});
+
+
+
+    //#region Row editing
 	//Add a row in the find recipe table
 	// Add event listener to the "add-row-button" button
 	document.getElementById("add-row-button").addEventListener("click", function() {
@@ -83,6 +91,31 @@ document.addEventListener('DOMContentLoaded', function () {
 		// Append the new row to the table body
 		ingredientRows.appendChild(newRow);
 	});
+
+
+    document.getElementById("del-row-button").addEventListener("click", function() {
+        const ingredientRows = document.getElementById("ingredient-rows");
+    
+        // Check if there are any rows to delete
+        if (ingredientRows.lastChild) {
+            ingredientRows.removeChild(ingredientRows.lastChild);
+        } else {
+            alert("przestań... masz problem? >:(");
+        }
+    });
+
+
+
+
+    //#endregion
+
+
+
+
+
+
+
+
 
 
 	//Show the table of details of a recipe
@@ -374,6 +407,14 @@ async function sendPositionToPython(position) {
 }
 //#endregion
 
+async function addRows(rows)
+{
+    console.log(rows);
+    for (let i = 0; i != rows; i++) {
+        console.log(i); // Prints numbers 0 through 9
+    }
+
+};
 
 
 //#region Populate lists RCP
@@ -401,23 +442,27 @@ async function populateRecipies() {
             // Set the value and text of the new option
             newOption.value = "RECIPE" + recipe.recipe_name;
             // Recipe name - Price in PLN from flask hook
-            newOption.textContent = "PLN" + recipe.total_cost;
+            newOption.textContent = recipe.recipe_name + " //  PLN " + recipe.total_cost;
 
             // Append the new option to the dropdown
             dropdown.appendChild(newOption);
         });
+        return;
     });
 }
 //#endregion
 
 
 
-	//Slider distance filter
-	var slider = document.getElementById("myRange");
-	var output = document.getElementById("demo");
-	output.innerHTML = slider.value;
+//#region Slider
 
-	slider.oninput = function() {
-		output.innerHTML = this.value;
-	}
+//Slider distance filter
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value;
+
+slider.oninput = function() {
+    output.innerHTML = this.value;
+}
+//#endregion
 });
