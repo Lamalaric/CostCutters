@@ -253,9 +253,31 @@ def get_item():
     
     try:
         items = data.get("items", [])
+
+
+        # -- UNTESTED CODE IF THERE IS A BUG THIS IS IT
+        # warning
+        # warning
+        # warning
+        # warning
+        # warning
+        # warning
+        # warning
+        if (get_distance(self, lat1, lon1 <= db.MaxDistance):
+            return jsonify({"message": "Out of distance"}), 400
+        else:
+            pass
         
         if not items:
             return jsonify({"error": "No items provided in the request"}), 400
+        # warning
+        # warning
+        # warning
+        # warning
+        # warning
+        # warning
+        # warning
+        # warning
         
         # Check for missing store or item in each object in the items array
         for item in items:
