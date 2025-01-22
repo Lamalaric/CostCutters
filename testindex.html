@@ -122,22 +122,29 @@
                         <li>Quick (5-10 minutes)</li>
                         <li>Cheap (20PLN/PP)</li>
                     </ul>
+                    
                     <a href="" class="recipe-link recipe1" style="text-decoration: none; color: var(--clr-text-light);">SEE INGREDIENTS</a>
                 </span>
-
+                
             </div>
         </div>
     </section>
+    <div id="load"></div>
     <!-- #endregion -->
-
+    
     <!-- #region SECOND SCREEN  -->
-    <section class="recipe-container">
-        <h1>Recipes</h1>
-        <div class="recipe-load" id="load">
-            <label for="recipes">LOAD A SAVED RECIPE :</label>
-            <select id="recipes" class="dropdownRecipe">
-                <option> -- Select a recipe -- </option>
-            </select>
+    <section class="recipe-container" style="padding: 50PX;">
+        <h1>SAVED RECIPES</h1>
+        <div class="recipe-load" ></div>
+        <div id="recipes" class="vertical-menu dropdownRecipe dropdown">
+            <div class="active">No recipe selected</div>
+            <!-- these need to be made selectable for me to put the js back in-->
+             <!-- ref js line 448-457-->
+        </div>
+
+           <!-- <select id="recipes" class="dropdownRecipe">-->
+           <!--     <option> -- Select a recipe -- </option>-->
+            <!--</select>-->
         </div>
     </section>
     <!-- #endregion -->

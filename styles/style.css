@@ -561,3 +561,11 @@ footer {
 .footer-links a:hover {
     color: var(--clr-accent-1);
 }
+
+/* Fix this part */
+.vertical-menu{
+    align-self: center;
+}
+.active{
+    color: blue;
+}

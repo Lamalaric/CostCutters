@@ -427,7 +427,8 @@ async function populateRecipies() {
             console.log(`Recipe Name: ${recipe.recipe_name}, Total Cost: $${recipe.total_cost}`);
 
             // Create a new option element
-            var newOption = document.createElement("option");
+            var newOption = document.createElement("div");
+            newOption.classList.add("active")
 
             // Set the value and text of the new option
             newOption.value = "RECIPE" + recipe.recipe_name;
